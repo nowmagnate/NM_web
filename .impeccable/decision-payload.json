@@ -1,0 +1,136 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned Struck & Assayed. Keep it, take the alternate, or re-roll. Light theme and smooth motion are pinned by your brief and hold in every option.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Struck & Assayed",
+      "kicker": "THE ROLL",
+      "lineage": "hallmarks and assay marks struck into finished metal",
+      "thesis": "A hallmark answers exactly the question this site has to answer: who made this, where, and in what year. The page becomes a bright milled plate carrying struck marks, and refuses the dev-agency arrangement of dark hero plus three icon cards.",
+      "palette": ["#F2F3EF", "#FFFFFF", "#15171A", "#C9F24D"],
+      "materials": ["milled aluminium plate", "struck punch impression", "inked assay mark"],
+      "viewport": "No hero card. The whole first screen is one continuous pale plate. The headline is struck into it at large scale with a real impressed edge, and a single row of small marks sits beneath it like a hallmark strip: a maker's mark, a date letter reading 2017, and a chartreuse-inked assay mark that is the primary action. Both audiences read the same strip and take different marks.",
+      "risk": "Struck depth has to be earned with layered inset shadow, not a bevel filter. Executed thinly it flattens into ordinary light-grey minimalism.",
+      "raised": [
+        {
+          "from": "challenger-vu-meter-bridge",
+          "raise": "The 24-template catalog is now one sweepable row of identical struck plates with a single varying mark, read across at a glance, instead of 24 independent cards."
+        },
+        {
+          "from": "challenger-kraftwerk-man-machine",
+          "raise": "Every mark sits on a visible registration grid with orthogonal rules connecting it, so nothing floats in unearned whitespace."
+        },
+        {
+          "from": "challenger-pop-culture-shelf-rebel-menu-interface",
+          "raise": "Display type reaches genuinely large scale and one field floods full-bleed, rather than everything sitting politely inside a container."
+        },
+        {
+          "from": "challenger-webgl-shader-portal",
+          "raise": "The page ground is one continuous plate rather than a stack of alternating section backgrounds."
+        },
+        {
+          "from": "challenger-galaxies-nebulae-deep-time-accretion-disk-threshold",
+          "raise": "Real emptiness is held at the centre of key compositions instead of every cell being filled."
+        },
+        {
+          "from": "challenger-reefs-bioluminescent-nocturnal-plankton-wake-stars",
+          "raise": "Motion leaves a brief decaying trace rather than snapping, so movement reads as continuous."
+        }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Practice Plate",
+      "kicker": "IMPECCABLE'S PICK",
+      "lineage": "the engraved nameplate and stationery beside a professional's door",
+      "thesis": "Every buyer in the template audience already owns one of these: the engraved plate that says the practice is real and established. The site becomes that plate and its letterhead.",
+      "palette": ["#F4F2ED", "#1A1815", "#8C7A52", "#FFFFFF"],
+      "materials": ["engraved brass", "letterpress stationery", "laid paper"],
+      "viewport": "A tall engraved plate centred on warm paper, the practice name and founding year cut into it, services set as an engraved index below.",
+      "risk": "This topped my own ranking, which is the problem: warm paper plus brass plus an engraved serif is very close to the look most models ship for any premium or established brief. Familiar and effective, but the least distinctive card on the table."
+    },
+    {
+      "id": "challenger-vu-meter-bridge",
+      "label": "VU Meter Bridge",
+      "verdict": "competitive",
+      "lineage": "the row of ballistic needles across a recording desk",
+      "thesis": "Services and templates as a long row of identical instruments read by sweeping the whole bridge, never by opening one.",
+      "palette": ["#F3EEE2", "#141414", "#B4121A", "#6B4E2E"],
+      "materials": ["ivory meter face behind glass", "walnut and steel desk frame"],
+      "viewport": "A full-width bridge of identical meter faces, each channel a capability, the row leaning together on load.",
+      "risk": "Holds product clarity for the catalog's sweep-the-row behaviour, but loses audience identification: a dental practice does not read itself in a recording desk, and a needle is a poor carrier for what a template actually looks like."
+    },
+    {
+      "id": "challenger-kraftwerk-man-machine",
+      "label": "Man-Machine Diagram",
+      "verdict": "declined",
+      "lineage": "neon line diagrams on a strict traffic grid",
+      "thesis": "Capabilities wired as a lit connector network.",
+      "palette": ["#0A0A0A", "#E5231B", "#F5C518", "#FFFFFF"],
+      "materials": ["enamel fill", "neon rule"],
+      "viewport": "A wiring schematic of the studio's capabilities, current travelling the connectors.",
+      "risk": "Declined: neon on black fights the pinned light theme, and neither audience reads itself in it. Kept its connector logic."
+    },
+    {
+      "id": "challenger-pop-culture-shelf-rebel-menu-interface",
+      "label": "Rebel Menu",
+      "verdict": "declined",
+      "lineage": "torn-paper collage menus in scarlet, black and white",
+      "thesis": "The catalog as full-frame poster splashes.",
+      "palette": ["#E3241C", "#000000", "#FFFFFF"],
+      "materials": ["torn paper", "halftone"],
+      "viewport": "A scarlet field with template choices as jagged cutouts at reckless angles.",
+      "risk": "Declined: a law firm will not buy from a punk poster, and reckless angles wreck a 24-item scan. Kept its nerve about scale."
+    },
+    {
+      "id": "challenger-webgl-shader-portal",
+      "label": "Shader Portal",
+      "verdict": "declined",
+      "lineage": "the full-bleed GPU scene of an experiential studio",
+      "thesis": "A living shader ground with thin type floating over it.",
+      "palette": ["#101014", "#F0EDE6", "#FF7A1A"],
+      "materials": ["fragment shader", "film grain"],
+      "viewport": "A breathing full-screen shader behind a single oversized word.",
+      "risk": "Declined: it sells an experiential studio, which misrepresents a practical services practice, hides the offer, and is heavy for a free-tier static host. Kept its single continuous surface."
+    },
+    {
+      "id": "challenger-galaxies-nebulae-deep-time-accretion-disk-threshold",
+      "label": "Accretion Disk",
+      "verdict": "declined",
+      "lineage": "a black-hole disk at the edge of disappearance",
+      "thesis": "Navigation as orbital viewpoints around an unmarked centre.",
+      "palette": ["#000000", "#9FC7FF", "#E0562F", "#E8B34A"],
+      "materials": ["graded disk light", "photon-ring gold"],
+      "viewport": "A warped luminous disk with labels orbiting the rim.",
+      "risk": "Declined on both axes: a services page is not an astrophysics viewer. Kept its unmarked centre."
+    },
+    {
+      "id": "challenger-reefs-bioluminescent-nocturnal-plankton-wake-stars",
+      "label": "Plankton Wake",
+      "verdict": "declined",
+      "lineage": "a night sea igniting under motion",
+      "thesis": "Pointer trails lighting a dark field.",
+      "palette": ["#01050B", "#2BE3FF", "#0C6C87"],
+      "materials": ["GPU particles", "black water"],
+      "viewport": "A dark field where movement draws decaying light.",
+      "risk": "Declined: a dark sea fights the pinned light theme and neither audience identifies with it. Kept its decaying-trace motion."
+    }
+  ],
+  "canonCard": {
+    "id": "canon",
+    "label": "The Category Standard",
+    "kicker": "PLAYED STRAIGHT",
+    "lineage": "the modern dev-studio marketing site",
+    "thesis": "What this category actually ships: a large centred headline, a soft gradient or subtle mesh, a logo strip, three-to-four capability cards, a process row, testimonials, a closing CTA.",
+    "palette": ["#FFFFFF", "#0B1220", "#3B5BFD", "#F1F5F9"],
+    "materials": ["soft elevation", "rounded cards"],
+    "viewport": "Centred headline, subhead, two buttons, product or abstract visual beneath, trust logos under the fold.",
+    "risk": "Instantly legible to both audiences and completely forgettable. Your buyers have six of these open in other tabs."
+  },
+  "reroll": {
+    "enabled": true,
+    "steer": true,
+    "registers": ["plain", "safer", "bolder"]
+  }
+}

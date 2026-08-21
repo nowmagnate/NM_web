@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.26, -0.14, 0, 1.01)",
+        "createdAt": "2026-08-17T12:19:33.450Z",
+        "reason": "Matches the source template's own easing curve, extracted from Deon startup-home; user asked to replicate its motion"
+      }
+    ]
+  }
+}

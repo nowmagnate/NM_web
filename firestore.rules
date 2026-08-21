@@ -1,0 +1,86 @@
+rules_version = '2';
+
+/**
+ * The `leads` collection is the only thing this project writes to Firestore.
+ * Everything here follows from two facts: the client SDK writes directly
+ * (there is no server on Firebase's free tier to broker the write), and a
+ * lead form is a public, unauthenticated surface that anyone can hit.
+ *
+ * So the rules do the job a backend would normally do:
+ *   - create-only. No one reads, updates, or deletes a lead from the client,
+ *     ever. Leads are read from the Firebase console.
+ *   - App Check required, so a request has to come from this app's own
+ *     compiled client, not a hand-crafted request from a script.
+ *   - Every field is type- and length-checked against what the two forms in
+ *     `src/lib/schemas.ts` can actually produce, so a crafted payload can't
+ *     write something the UI never would.
+ *   - `submittedAt` must equal `request.time`, which only the `serverTimestamp()`
+ *     sentinel produces — this stops a spoofed submission date.
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /leads/{leadId} {
+      allow read, update, delete: if false;
+
+      // `request.app != null` is populated only when App Check is both
+      // configured client-side (NEXT_PUBLIC_RECAPTCHA_SITE_KEY) AND
+      // enforcement is turned on for Firestore in the Firebase console.
+      // Until both are true, this stays null and every create is rejected —
+      // fail closed rather than accept public writes with no anti-abuse
+      // check in front of them.
+      allow create: if request.app != null
+        && isValidLead(request.resource.data);
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+
+  function isValidLead(data) {
+    return data.keys().hasAll(['kind', 'submittedAt', 'status'])
+      && data.kind in ['contact', 'brief']
+      && data.submittedAt == request.time
+      && data.status == 'new'
+      && (data.kind == 'contact' ? isValidContactLead(data) : isValidBriefLead(data));
+  }
+
+  function isValidContactLead(data) {
+    return data.keys().hasAll(['name', 'email', 'projectType', 'budget', 'message'])
+      && isBoundedString(data.name, 2, 120)
+      && isValidEmail(data.email)
+      && isBoundedString(data.projectType, 1, 60)
+      && isBoundedString(data.budget, 1, 40)
+      && isBoundedString(data.message, 20, 2000)
+      && (!('company' in data) || isBoundedString(data.company, 0, 120));
+  }
+
+  function isValidBriefLead(data) {
+    return data.keys().hasAll(
+        ['businessName', 'practiceType', 'domainStatus', 'assetsReady', 'name', 'email']
+      )
+      && isBoundedString(data.businessName, 2, 160)
+      && isBoundedString(data.practiceType, 2, 160)
+      && data.domainStatus in ['have-domain', 'need-domain', 'not-sure']
+      && data.assetsReady in ['ready', 'partial', 'need-help']
+      && isBoundedString(data.name, 2, 120)
+      && isValidEmail(data.email)
+      && (!('templateSlug' in data) || isBoundedString(data.templateSlug, 0, 80))
+      && (!('currentSite' in data) || isBoundedString(data.currentSite, 0, 300))
+      && (!('targetLaunch' in data) || isBoundedString(data.targetLaunch, 0, 200))
+      && (!('phone' in data) || isBoundedString(data.phone, 0, 40));
+  }
+
+  function isBoundedString(value, minLen, maxLen) {
+    return value is string && value.size() >= minLen && value.size() <= maxLen;
+  }
+
+  function isValidEmail(value) {
+    // Deliberately loose — real validation already happened client-side via
+    // Zod. This only needs to reject obviously malformed data, not be a
+    // complete RFC 5322 matcher.
+    return value is string && value.size() <= 254 && value.matches('.+@.+\\..+');
+  }
+}

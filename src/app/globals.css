@@ -1,0 +1,474 @@
+@import "tailwindcss" source(none);
+
+/* Scan source only. Tailwind v4 auto-detects content across the whole
+   project, which pulled class-like strings out of the markdown design docs
+   (BUILD-PLAN.md, design/DESIGN-NOTES.md) and emitted dead rules for tokens
+   that no longer exist. Scoping the scan keeps the stylesheet honest and
+   makes the build cheaper. */
+@source "../";
+
+/* ==========================================================================
+   SPECTRUM — the token layer.
+
+   The world: a bright white studio sheet with one prismatic accent. Type does
+   the structural work (Syne at display scale, Archivo tracked-out for every
+   interface label), rules divide, and colour appears almost only as a single
+   five-stop gradient — the spectrum — clipped into text or drawn as a hairline.
+
+   The rule that makes it cohere: THE ACCENT IS NEVER A FLAT FILL. It is a
+   gradient, and it is used on marks that carry meaning (a section title, an
+   ordinal numeral, a progress line), never as a decorative wash behind copy.
+
+   The only place raw colour exists. Nothing outside this file carries a hex.
+
+   LIGHT ONLY, by decision. `color-scheme: light` is declared so browser-drawn
+   UI follows.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --bg: #ffffff;
+  /* A barely-warm off-white for alternating bands. */
+  --bg-soft: #fbf9f9;
+  --bg-mute: #f3f3f3;
+  /* The one dark field, used at most once per page. */
+  --bg-deep: #0d0d0f;
+  --bg-deep-ink: #ffffff;
+
+  /* --- Ink -------------------------------------------------------------- */
+  --ink: #000000;
+  --ink-soft: #1b1b1b;
+  --ink-muted: #6e6e6e;
+  /* Eyebrows and metadata. 4.6:1 on white, so it clears AA for body copy. */
+  --ink-faint: #767676;
+  /* Non-text only: rules, disabled glyphs, ghosted numerals. */
+  --ink-ghost: #a6a6a6;
+
+  /* --- Rules ------------------------------------------------------------ */
+  --rule: rgb(0 0 0 / 0.12);
+  --rule-strong: rgb(0 0 0 / 0.28);
+
+  /* --- The spectrum ----------------------------------------------------
+     Five stops, sky through indigo to orchid. Declared as stops as well as
+     assembled gradients so a component can pick a single stop for a hairline
+     without re-typing the ramp. */
+  --spec-1: #5cc3ee;
+  --spec-2: #5d91ef;
+  --spec-3: #5e5ef0;
+  --spec-4: #947be1;
+  --spec-5: #ca97d2;
+
+  /* The canonical ramp: section titles, gradient text, key marks. */
+  --spectrum: linear-gradient(
+    60deg,
+    var(--spec-1) 0%,
+    var(--spec-2) 29%,
+    var(--spec-3) 50%,
+    var(--spec-4) 73%,
+    var(--spec-5) 100%
+  );
+  /* Horizontal variant for the giant ordinals, which are wide, not tall. */
+  --spectrum-h: linear-gradient(
+    -90deg,
+    var(--spec-1) 0%,
+    var(--spec-3) 50%,
+    var(--spec-5) 100%
+  );
+
+  /* The one flat use, and only for hairlines and focus rings — never text. */
+  --accent-line: #57b8e0;
+  /* A whisper of the ramp, for hover fields under dark text. */
+  --accent-wash: rgb(94 94 240 / 0.07);
+
+  /* --- Validation ------------------------------------------------------- */
+  --danger: #d0342c;
+  --danger-wash: rgb(208 52 44 / 0.08);
+
+  /* --- Depth -----------------------------------------------------------
+     Near-flat. This world is printed, not machined: a card is separated by a
+     rule or by ground colour first, and only lifts on interaction. Shadows
+     are neutral and low, never coloured. */
+  --lift-sm: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 6px -2px rgb(0 0 0 / 0.06);
+  --lift: 0 2px 4px rgb(0 0 0 / 0.04), 0 10px 24px -8px rgb(0 0 0 / 0.09);
+  --lift-lg: 0 4px 8px rgb(0 0 0 / 0.04), 0 28px 56px -16px rgb(0 0 0 / 0.13);
+
+  /* --- Geometry --------------------------------------------------------
+     Square. Every edge in this system is a right angle: buttons, cards,
+     inputs, images. That squareness is the single strongest signal that the
+     page was drawn rather than assembled from a component library, and it is
+     why nothing here has a radius scale. `--r-full` survives for parts that
+     are genuinely circular (carousel dots, avatars). */
+  --r-none: 0px;
+  --r-full: 999px;
+
+  /* --- Motion ----------------------------------------------------------
+     Long, soft, slightly overshooting. Content arrives by rising 50px and
+     fading in over ~0.7s; nothing snaps. */
+  --ease-rise: cubic-bezier(0.26, -0.14, 0, 1.01);
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 200ms;
+  --t-base: 450ms;
+  --t-slow: 700ms;
+  --t-line: 1600ms;
+}
+
+/* ==========================================================================
+   MIGRATION SHIM
+
+   The previous system ("Struck & Assayed") named its surfaces after milled
+   metal: ground/plate/pocket, struck/raised depth, a chartreuse assay mark.
+   Sections are being moved onto the spectrum system one at a time, so the old
+   names are aliased here rather than deleted — that keeps every unmigrated
+   section rendering correctly instead of falling back to transparent.
+
+   DELETE THIS BLOCK, and the aliases in the theme bridge below, once the last
+   section stops referencing the old names. Nothing new should use them.
+   ========================================================================== */
+
+:root {
+  --ground: var(--bg);
+  --plate: var(--bg);
+  --pocket: var(--bg-mute);
+
+  /* Was a chartreuse field carrying black text. Now the palest step of the
+     spectrum, chosen so `text-ink` on it still clears AA by a wide margin. */
+  --mark: #e9e7fd;
+  --mark-deep: var(--spec-3);
+  --mark-wash: var(--accent-wash);
+
+  --deep: var(--bg-deep);
+  --deep-ink: var(--bg-deep-ink);
+
+  --r-mark: var(--r-none);
+  --r-plate: var(--r-none);
+  --r-pocket: var(--r-none);
+
+  --struck-sm: none;
+  --struck: none;
+  --struck-deep: none;
+  --raised-sm: var(--lift-sm);
+  --raised: var(--lift);
+  --raised-lg: var(--lift-lg);
+  --edge-light: none;
+
+  --ease-strike: var(--ease-settle);
+}
+
+/* ==========================================================================
+   TAILWIND THEME BRIDGE
+   ========================================================================== */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-mute: var(--bg-mute);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-deep-ink: var(--bg-deep-ink);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-ghost: var(--ink-ghost);
+
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  --color-spec-1: var(--spec-1);
+  --color-spec-2: var(--spec-2);
+  --color-spec-3: var(--spec-3);
+  --color-spec-4: var(--spec-4);
+  --color-spec-5: var(--spec-5);
+  --color-accent-line: var(--accent-line);
+  --color-accent-wash: var(--accent-wash);
+
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+
+  --shadow-lift-sm: var(--lift-sm);
+  --shadow-lift: var(--lift);
+  --shadow-lift-lg: var(--lift-lg);
+
+  --ease-rise: var(--ease-rise);
+  --ease-settle: var(--ease-settle);
+
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- shim aliases (see MIGRATION SHIM above) -------------------------- */
+  --color-ground: var(--ground);
+  --color-plate: var(--plate);
+  --color-pocket: var(--pocket);
+  --color-mark: var(--mark);
+  --color-mark-deep: var(--mark-deep);
+  --color-mark-wash: var(--mark-wash);
+  --color-deep: var(--deep);
+  --color-deep-ink: var(--deep-ink);
+  --radius-mark: var(--r-mark);
+  --radius-plate: var(--r-plate);
+  --radius-pocket: var(--r-pocket);
+  --shadow-struck-sm: var(--struck-sm);
+  --shadow-struck: var(--struck);
+  --shadow-struck-deep: var(--struck-deep);
+  --shadow-raised-sm: var(--raised-sm);
+  --shadow-raised: var(--raised);
+  --shadow-raised-lg: var(--raised-lg);
+  --ease-strike: var(--ease-strike);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  background-color: var(--bg);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.41; /* 24/17, the template's body ratio */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  /* Syne is drawn wide and already sits tight at display sizes. Negative
+     tracking closes its counters and kills the flare that gives it character,
+     so the ramp stays at normal and only the largest sizes pull back a hair. */
+  letter-spacing: normal;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   BROWSER SURFACES
+   The parts not drawn by hand still belong to the design. Shipping these as
+   browser defaults is the cheapest tell that a page was assembled rather
+   than built.
+   ========================================================================== */
+
+::selection {
+  background-color: var(--spec-3);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 0;
+}
+
+/* The caret is the smallest struck mark on the page. */
+input,
+textarea,
+select {
+  caret-color: var(--ink);
+}
+
+html {
+  scrollbar-color: var(--ink-ghost) var(--bg-mute);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-mute);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-ghost);
+  border: 3px solid var(--bg-mute);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-muted);
+}
+
+/* Figures in a spec column line up when they are tabular. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+/* The spectrum clipped into letterforms. The signature move of this system,
+   and deliberately rationed: a section's main title, or a numeral that stands
+   in for a whole passage. Two or more per viewport and it stops reading as an
+   accent.
+
+   `color` is set first so a browser without background-clip:text still gets
+   solid ink rather than invisible type. */
+@utility spectrum-text {
+  color: var(--spec-3);
+  background-image: var(--spectrum);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* The horizontal ramp, for marks that are wider than they are tall — chiefly
+   the giant ordinals in the numbered list. */
+@utility spectrum-text-h {
+  color: var(--spec-3);
+  background-image: var(--spectrum-h);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Every small uppercase label on the site: nav items, buttons, chips, table
+   headers. Archivo, tracked hard, never larger than 13px. */
+@utility ui-label {
+  font-family: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* The kicker above a section title. Syne rather than Archivo, so it reads as
+   part of the heading it introduces rather than as a control. */
+@utility eyebrow {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  line-height: 1.23;
+  color: var(--ink-faint);
+}
+
+/* ENTRANCE — the template's signature move, and deliberately CSS rather than
+   JS.
+
+   Content that starts at `opacity: 0` and waits for a script to reveal it is
+   invisible whenever that script has not run: before hydration, in a
+   background tab where rAF is throttled, in a headless render, or if the
+   bundle fails outright. A keyframe with `animation-fill-mode: both` gives the
+   identical result and degrades to "visible" instead of "blank".
+
+   Stagger is set per-element with an inline `animation-delay`. The reduced-
+   motion backstop at the foot of this file collapses the duration, which lands
+   the element at its `to` state immediately — visible, unmoved. */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  animation: rise-in var(--t-slow) var(--ease-rise) both;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility scale-in {
+  animation: scale-in 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* A rule that draws itself in from the left on hover. Used on text links and
+   nav items. Lives on a pseudo-element so it never affects layout, and it is
+   the hover language for anything that does not have a border to change. */
+@utility underline-draw {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    /* Drawn with a scale rather than by animating `width`. The rule is laid
+       out once at full width and collapsed to nothing on the compositor, so
+       the hover costs no layout pass. Visually identical, including under a
+       gradient fill: the ramp spans the element's own box either way. */
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t-base) var(--ease-settle);
+  }
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+@utility scroll-rail {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility snap-item {
+  scroll-snap-align: start;
+}
+
+@utility sr-only-focusable {
+  &:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* ==========================================================================
+   REDUCED MOTION
+   A hard backstop. Components also check useReducedMotion() so JS-driven
+   motion never starts; this catches anything CSS-only.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

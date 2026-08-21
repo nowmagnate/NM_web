@@ -1,0 +1,101 @@
+/**
+ * Copy this file to `src/app/work/[slug]/page.tsx` once the FIRST real
+ * .mdx file exists in this directory — not before.
+ *
+ * WHY THIS ISN'T ALREADY A LIVE ROUTE: Next's `output: 'export'` hard-fails
+ * the build if a dynamic segment's `generateStaticParams()` resolves to zero
+ * paths — an empty result is treated identically to a missing function, not
+ * as "generate nothing." With zero case studies, `getAllCaseStudySlugs()`
+ * correctly returns `[]`, which means this page cannot exist as a route yet.
+ * The loader it depends on (`src/lib/caseStudyContent.ts`) has no such
+ * restriction and is safe to keep wired up in advance.
+ */
+
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Section } from "@/components/ui/Section";
+import { getAllCaseStudySlugs, getCaseStudyContent } from "@/lib/caseStudyContent";
+
+/**
+ * Deliberately not `@tailwindcss/typography`. This site has a locked type
+ * scale and a locked radius system (see design/DESIGN-NOTES.md); a prose
+ * reset would bring its own heading sizes and spacing, drifting from both.
+ * These overrides keep MDX body content on the same tokens as everywhere
+ * else, at the cost of writing out each tag once.
+ */
+const mdxComponents = {
+  h2: (props: React.ComponentPropsWithoutRef<"h2">) => (
+    <h2 className="mt-12 font-display text-2xl" {...props} />
+  ),
+  h3: (props: React.ComponentPropsWithoutRef<"h3">) => (
+    <h3 className="mt-8 font-display text-xl" {...props} />
+  ),
+  p: (props: React.ComponentPropsWithoutRef<"p">) => (
+    <p className="mt-5 leading-relaxed text-ink-muted" {...props} />
+  ),
+  ul: (props: React.ComponentPropsWithoutRef<"ul">) => (
+    <ul className="mt-5 list-disc space-y-2 pl-5 leading-relaxed text-ink-muted" {...props} />
+  ),
+  strong: (props: React.ComponentPropsWithoutRef<"strong">) => (
+    <strong className="font-medium text-ink" {...props} />
+  ),
+  a: (props: React.ComponentPropsWithoutRef<"a">) => (
+    <a className="text-accent underline decoration-dotted underline-offset-4" {...props} />
+  ),
+};
+
+/** Prerenders one page per file in `src/content/case-studies/`. */
+export function generateStaticParams() {
+  return getAllCaseStudySlugs().map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const study = getCaseStudyContent(slug);
+  if (!study) return {};
+
+  return {
+    title: study.frontmatter.title,
+    description: study.frontmatter.summary,
+  };
+}
+
+export default async function CaseStudyPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const study = getCaseStudyContent(slug);
+  if (!study) notFound();
+
+  return (
+    <>
+      <Header />
+      <main id="main">
+        <Section spacing="compact" className="pt-32" container="narrow">
+          <p className="font-mono text-[12px] text-ink-muted">
+            {study.frontmatter.client} · {study.frontmatter.year}
+          </p>
+          <h1 className="mt-3 font-display text-4xl leading-[1.05] md:text-5xl">
+            {study.frontmatter.title}
+          </h1>
+        </Section>
+
+        <Section spacing="compact" className="pt-0" container="narrow">
+          <div>
+            <MDXRemote source={study.body} components={mdxComponents} />
+          </div>
+        </Section>
+      </main>
+      <Footer />
+    </>
+  );
+}
