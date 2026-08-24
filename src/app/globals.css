@@ -399,6 +399,60 @@ html {
   animation: scale-in 1s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
+/* The hero prism's own entrance, separate from `scale-in`: it falls and
+   turns into place rather than just scaling up, because it is a solid
+   object arriving in 3D space, not a flat panel fading in. The `to` state
+   is NOT face-on — it holds a permanent slight tilt (rotateX/rotateY),
+   because a prism viewed dead-on reads as a flat triangle, not a solid.
+   That resting tilt is set here in pure CSS specifically so it is correct
+   with JavaScript disabled or before hydration; idle drift and pointer/
+   scroll tilt (see HeroPrism.tsx) only ADD a delta on top of it, on nested
+   children, so each motion owns its own `transform` instead of two
+   `animation`s fighting one property. */
+@keyframes prism-strike {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotateX(-28deg) rotateY(38deg) scale(0.84);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(-9deg) rotateY(17deg) scale(1);
+  }
+}
+
+@utility prism-strike {
+  animation: prism-strike 900ms var(--ease-settle) both;
+  animation-delay: 150ms;
+}
+
+@keyframes prism-drift {
+  0%,
+  100% {
+    transform: rotateY(-8deg) rotateX(3deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(8deg) rotateX(-3deg) translateY(-10px);
+  }
+}
+
+@utility prism-drift {
+  animation: prism-drift 13s ease-in-out infinite;
+}
+
+@keyframes ray-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@utility ray-pulse {
+  animation: ray-pulse 3.4s ease-in-out infinite;
+}
+
 /* A rule that draws itself in from the left on hover. Used on text links and
    nav items. Lives on a pseudo-element so it never affects layout, and it is
    the hover language for anything that does not have a border to change. */
