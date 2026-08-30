@@ -1,5 +1,11 @@
 @import "tailwindcss" source(none);
 
+/* The template token layer. Imported here rather than into each template so
+   it stays inside the single Tailwind entry: `@theme inline` only produces
+   utilities from the stylesheet Tailwind is actually compiling. See
+   src/templates/kit/tokens.css for why templates need their own namespace. */
+@import "../templates/kit/tokens.css";
+
 /* Scan source only. Tailwind v4 auto-detects content across the whole
    project, which pulled class-like strings out of the markdown design docs
    (BUILD-PLAN.md, design/DESIGN-NOTES.md) and emitted dead rules for tokens
@@ -525,4 +531,38 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ==========================================================================
+   LIVE TEMPLATE PREVIEW
+
+   The catalog detail page embeds the real template at `/preview/<slug>/`
+   rather than a captured screenshot. A screenshot is a second artefact that
+   goes stale the moment the template is edited, and this catalog has already
+   shipped seven ground corrections that would each have invalidated one.
+
+   The template is rendered at a desktop width inside a frame and scaled down,
+   because the desktop composition is what a buyer is choosing between. The
+   scale is derived from the container's own width with container query units,
+   so it stays exact at every breakpoint. The plain `scale()` above it is the
+   fallback for any engine that will not divide two lengths in `calc()`; it is
+   correct at the widest breakpoint and merely approximate below it.
+   ========================================================================== */
+
+.preview-frame {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-frame iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1010px;
+  border: 0;
+  transform-origin: top left;
+  transform: scale(0.46);
+  transform: scale(calc(100cqw / 1440px));
 }

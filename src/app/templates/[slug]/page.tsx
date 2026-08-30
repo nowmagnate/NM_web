@@ -8,10 +8,13 @@ import { Section } from "@/components/ui/Section";
 import { Faq } from "@/components/sections/Faq";
 import { PaymentCTA } from "@/components/templates/PaymentCTA";
 import { TemplateCard } from "@/components/templates/TemplateCard";
+import { LivePreview } from "@/components/templates/LivePreview";
+import { hasLivePreview } from "@/templates/registry";
 import { templates, templateSlugs, getTemplate } from "@/data/templates";
 import { offer } from "@/data/offer";
 import { templateFaq } from "@/data/faq";
 import { placeholderImage } from "@/lib/placeholder";
+import { siteUrl } from "@/config/site";
 import { pageMetadata } from "@/lib/metadata";
 import { templateProductJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/jsonLd";
 
@@ -50,6 +53,10 @@ export default async function TemplateDetailPage({
   const template = getTemplate(slug);
   if (!template) notFound();
 
+  // Only built templates get a live embed. Everything else keeps the
+  // placeholder and the concept chip.
+  const live = hasLivePreview(template.slug);
+
   const related = templates
     .filter((t) => t.category === template.category && t.slug !== template.slug)
     .slice(0, 3);
@@ -59,7 +66,9 @@ export default async function TemplateDetailPage({
       name: template.name,
       description: template.blurb,
       path: `/templates/${template.slug}`,
-      imageUrl: placeholderImage(`template-${template.slug}`, 1600, 1200),
+      imageUrl: hasLivePreview(template.slug)
+        ? `${siteUrl}/templates/${template.slug}/hero.jpg`
+        : placeholderImage(`template-${template.slug}`, 1600, 1200),
     }),
     breadcrumbJsonLd([
       { name: "Templates", path: "/templates" },
@@ -114,23 +123,29 @@ export default async function TemplateDetailPage({
             </div>
 
             <div className="lg:col-span-7">
-              <div className="border-rule relative border">
-                {/* TODO(asset): see design/ASSET-MANIFEST.md */}
-                <Image
-                  src={placeholderImage(`template-${template.slug}`, 1600, 1200)}
-                  alt={`${template.name}, a template for a ${template.practiceType.toLowerCase()}`}
-                  width={1600}
-                  height={1200}
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 55vw"
-                  className="aspect-4/3 w-full object-cover"
+              {live ? (
+                <LivePreview
+                  slug={template.slug}
+                  name={template.name}
+                  practiceType={template.practiceType}
                 />
-                {template.previewStatus === "comp" ? (
+              ) : (
+                <div className="border-rule relative border">
+                  {/* TODO(asset): see design/ASSET-MANIFEST.md */}
+                  <Image
+                    src={placeholderImage(`template-${template.slug}`, 1600, 1200)}
+                    alt={`${template.name}, a template for a ${template.practiceType.toLowerCase()}`}
+                    width={1600}
+                    height={1200}
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 55vw"
+                    className="aspect-4/3 w-full object-cover"
+                  />
                   <span className="ui-label border-ink bg-bg/90 text-ink absolute top-4 left-4 border px-3 py-2 text-[10px] backdrop-blur-sm">
-                    Design concept · live preview coming soon
+                    Design concept · not built yet
                   </span>
-                ) : null}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </Section>

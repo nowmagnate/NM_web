@@ -9,7 +9,11 @@
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "typecheck": "tsc --noEmit",
-    "audit": "node scripts/audit-copy.mjs"
+    "audit": "node scripts/audit-copy.mjs",
+    "check:contrast": "node scripts/check-template-contrast.mjs",
+    "check:templates": "node scripts/check-templates.mjs",
+    "check:type": "node scripts/check-typography.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run audit && npm run check:contrast && npm run check:type && npm run check:templates"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
@@ -22,6 +26,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",
+    "three": "^0.185.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -31,6 +36,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@types/three": "^0.185.4",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.0",
     "prettier": "^3.4.2",

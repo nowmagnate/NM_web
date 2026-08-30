@@ -1,0 +1,514 @@
+/* ==========================================================================
+   TEMPLATE TOKENS — the `tpl-*` namespace.
+
+   The site has one visual world (SPECTRUM, in globals.css) and the templates
+   have twenty-four of their own. They cannot share a namespace: `src/app/
+   layout.tsx` is unavoidable, so `globals.css` and every Spectrum token apply
+   to `/preview/<slug>/` whether the template wants them or not.
+
+   So templates get a parallel set. `@theme inline` below compiles the
+   `--tpl-*` custom properties into Tailwind utilities (`bg-tpl-bg`,
+   `text-tpl-ink`, `border-tpl-rule`, `font-tpl-display`, `rounded-tpl`), and
+   because those utilities resolve to `var(--tpl-*)` at use time rather than to
+   a literal colour, redeclaring a property on a wrapper element re-themes
+   everything inside it. That is the whole theming mechanism: a template's
+   palette is applied as inline custom properties on one wrapper, read straight
+   out of its config. Palette is data. It never becomes CSS.
+
+   The prefix is `tpl` and not `t` because `rounded-t-*` is already Tailwind's.
+
+   THREE VALUES ARE AUTHORED, the rest are derived. A template config supplies
+   ink, bg and accent (the same three swatches the catalog already publishes
+   for it) and the derivations below produce the working tokens by rule rather
+   than by taste. A client who swaps the accent cannot break contrast, because
+   accent never sets text at body size: text on an accent field reads against
+   `--tpl-accent-deep`, which is the accent carried far enough toward ink to
+   clear AA against white.
+
+   Any of the derived values can still be overridden per template by passing it
+   in the config; the inline declaration simply wins.
+
+   RULE FOR SECTION COMPONENTS: inside `src/templates/`, use `tpl-*` utilities
+   exclusively. A site utility (`bg-bg`, `text-ink`, `font-display`) appearing
+   in a template section is a review failure, because it silently binds that
+   section to the studio's own palette.
+   ========================================================================== */
+
+.tpl {
+  /* --- Authored -------------------------------------------------------- */
+  --tpl-ink: #14171a;
+  --tpl-bg: #ffffff;
+  --tpl-accent: #4a6b8a;
+
+  /* The authored pair, held under a second name so `.tpl-invert` can swap
+     them without writing a circular custom-property reference. */
+  --tpl-ink-base: var(--tpl-ink);
+  --tpl-bg-base: var(--tpl-bg);
+
+  /* --- Derived ---------------------------------------------------------
+     Each of these is a rule, and the rule is the same for all 24 templates.
+     They are written against the authored three, so overriding an authored
+     value cascades through every derivation without any recomputation. */
+
+  /* The one lifted band. Bg carried 30% toward white, which stays a surface
+     rather than becoming a second background colour. */
+  --tpl-surface: color-mix(in srgb, var(--tpl-bg) 70%, #ffffff);
+
+  /* Secondary body copy. 72% is the lightest ink can go over its own ground
+     and still clear AA at body size, so it is the floor, not a preference. */
+  --tpl-muted: color-mix(in srgb, var(--tpl-ink) 72%, var(--tpl-bg));
+
+  /* Non-text only. */
+  --tpl-faint: color-mix(in srgb, var(--tpl-ink) 46%, var(--tpl-bg));
+
+  --tpl-rule: color-mix(in srgb, var(--tpl-ink) 12%, var(--tpl-bg));
+  --tpl-rule-strong: color-mix(in srgb, var(--tpl-ink) 26%, var(--tpl-bg));
+
+  /* A whisper of accent for hover fields and quiet bands. */
+  --tpl-wash: color-mix(in srgb, var(--tpl-accent) 9%, var(--tpl-bg));
+
+  /* The text-safe accent. The catalog accents are chosen to look right as a
+     swatch, which puts most of them near 3:1 on white: fine for a hairline or
+     an icon, not enough under a 12px tracked label. Carrying the accent 45%
+     toward ink keeps the hue and buys the contrast. */
+  --tpl-accent-deep: color-mix(in srgb, var(--tpl-accent) 55%, var(--tpl-ink));
+
+  --tpl-on-accent: #ffffff;
+  --tpl-on-ink: var(--tpl-bg);
+
+  /* --- The hero field --------------------------------------------------
+     A tinted ground that owns the whole first viewport. This is what lets an
+     opening read as ONE composed image rather than as copy sitting beside a
+     photograph: the ground, the giant ghost lettering, the subject and the
+     headline all share a field instead of each occupying a box. 22% of the
+     accent is the most a ground can carry and still hold ink at better than
+     10:1, which is what keeps the headline safe on top of it. */
+  --tpl-field: color-mix(in srgb, var(--tpl-accent) 22%, var(--tpl-bg));
+
+  /* The giant lettering drawn INTO the field, cropped by the viewport edges.
+     Declared as ink at low alpha rather than as a mix with a named ground, so
+     the same token works over the field, the ground and the inverted band
+     without any of them having to know about it. */
+  --tpl-ghost: color-mix(in srgb, var(--tpl-ink) 11%, transparent);
+
+  /* Secondary copy that has to sit on the field. `--tpl-muted` is derived
+     against the plain ground and lands near 4.2:1 on a tinted one, which is
+     under AA, so anything on the field uses this instead. Alpha rather than a
+     mix, for the same ground-agnostic reason as the ghost. */
+  --tpl-muted-strong: color-mix(in srgb, var(--tpl-ink) 80%, transparent);
+
+  /* --- Geometry --------------------------------------------------------
+     One radius per template, set in the config and applied everywhere.
+
+     `--tpl-pill` is separate and is NOT configurable. Small controls (nav
+     links, chips, the seal) are fully round in this system whatever the
+     template's structural radius is, because a pill reads as a control and a
+     rectangle reads as a container, and the two jobs should not share a
+     shape. */
+  --tpl-radius: 0px;
+  --tpl-pill: 999px;
+
+  /* --- Rhythm ----------------------------------------------------------
+     Density is a template-level decision, not a per-section one, so a band
+     never has to be told how tall to be. */
+  --tpl-band-y: clamp(4rem, 7vw, 6.5rem);
+  --tpl-gutter: clamp(1.25rem, 4vw, 3rem);
+  --tpl-measure: 68ch;
+
+  /* How far an anchored band sits below the sticky header stack when it is
+     jumped to. Taller on phones, where the demo bar wraps to three lines. */
+  --tpl-anchor: 9.5rem;
+
+  /* --- Motion ----------------------------------------------------------
+     One gesture per archetype, three intensities down the page. Defaults are
+     the booking-led "settle"; the data-motion blocks below swap the curve. */
+  --tpl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tpl-dur: 420ms;
+  --tpl-rise: 16px;
+}
+
+@media (min-width: 768px) {
+  .tpl {
+    --tpl-anchor: 8rem;
+  }
+}
+
+/* ==========================================================================
+   THE DARK BAND
+
+   A template is allowed one inverted band, typically the one that asks for the
+   booking. It is not a second palette: ink and ground trade places and every
+   derived token is recomputed from the swap by the same rules, so the band is
+   still unmistakably this template rather than a black box borrowed from
+   another one.
+
+   The proportions change slightly because the same ratio does not read the
+   same on a dark ground. A 12% rule is invisible on near-black, so it goes to
+   16%; and `accent-deep` reverses direction, moving toward the light ground
+   instead of toward ink, because on this band it has to carry dark text.
+   ========================================================================== */
+
+.tpl .tpl-invert {
+  --tpl-bg: var(--tpl-ink-base);
+  --tpl-ink: var(--tpl-bg-base);
+
+  --tpl-surface: color-mix(in srgb, var(--tpl-bg) 92%, #ffffff);
+  --tpl-muted: color-mix(in srgb, var(--tpl-ink) 76%, var(--tpl-bg));
+  --tpl-faint: color-mix(in srgb, var(--tpl-ink) 50%, var(--tpl-bg));
+  --tpl-rule: color-mix(in srgb, var(--tpl-ink) 16%, var(--tpl-bg));
+  --tpl-rule-strong: color-mix(in srgb, var(--tpl-ink) 34%, var(--tpl-bg));
+  --tpl-wash: color-mix(in srgb, var(--tpl-accent) 16%, var(--tpl-bg));
+  --tpl-accent-deep: color-mix(in srgb, var(--tpl-accent) 62%, var(--tpl-ink));
+  --tpl-on-accent: var(--tpl-ink-base);
+  --tpl-on-ink: var(--tpl-bg-base);
+  --tpl-field: color-mix(in srgb, var(--tpl-accent) 22%, var(--tpl-bg));
+
+  background-color: var(--tpl-bg);
+  color: var(--tpl-ink);
+}
+
+.tpl[data-density="airy"] {
+  --tpl-band-y: clamp(5rem, 9vw, 9rem);
+}
+.tpl[data-density="tight"] {
+  --tpl-band-y: clamp(3rem, 5vw, 4.75rem);
+}
+
+/* Portfolio-led. The image uncovers rather than slides. */
+.tpl[data-motion="reveal"] {
+  --tpl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --tpl-dur: 640ms;
+  --tpl-rise: 22px;
+}
+/* Authority-led. Symmetric, mechanical, closest of the four to static. */
+.tpl[data-motion="rule"] {
+  --tpl-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --tpl-dur: 900ms;
+  --tpl-rise: 8px;
+}
+/* Inventory. A slight dip before the rise gives the grid weight. */
+.tpl[data-motion="stagger"] {
+  --tpl-ease: cubic-bezier(0.26, -0.14, 0, 1.01);
+  --tpl-dur: 380ms;
+  --tpl-rise: 14px;
+}
+
+/* ==========================================================================
+   TAILWIND THEME BRIDGE
+   ========================================================================== */
+
+@theme inline {
+  --color-tpl-bg: var(--tpl-bg);
+  --color-tpl-surface: var(--tpl-surface);
+  --color-tpl-ink: var(--tpl-ink);
+  --color-tpl-muted: var(--tpl-muted);
+  --color-tpl-muted-strong: var(--tpl-muted-strong);
+  --color-tpl-field: var(--tpl-field);
+  --color-tpl-ghost: var(--tpl-ghost);
+  --color-tpl-faint: var(--tpl-faint);
+  --color-tpl-rule: var(--tpl-rule);
+  --color-tpl-rule-strong: var(--tpl-rule-strong);
+  --color-tpl-wash: var(--tpl-wash);
+  --color-tpl-accent: var(--tpl-accent);
+  --color-tpl-accent-deep: var(--tpl-accent-deep);
+  --color-tpl-on-accent: var(--tpl-on-accent);
+  --color-tpl-on-ink: var(--tpl-on-ink);
+
+  --font-tpl-display: var(--tpl-font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-tpl-body: var(--tpl-font-body), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-tpl: var(--tpl-radius);
+  --radius-tpl-pill: var(--tpl-pill);
+  --radius-tpl-lg: calc(var(--tpl-radius) * 2);
+
+  --ease-tpl: var(--tpl-ease);
+}
+
+/* ==========================================================================
+   BASE, scoped to the wrapper.
+
+   The site's own `body` rules set a font, a size and a line height for the
+   whole document. A template overrides them on its own root rather than
+   fighting them per element.
+   ========================================================================== */
+
+.tpl {
+  background-color: var(--tpl-bg);
+  color: var(--tpl-ink);
+  font-family: var(--tpl-font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.tpl h1,
+.tpl h2,
+.tpl h3,
+.tpl h4 {
+  font-family: var(--tpl-font-display), ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  font-weight: 600;
+}
+
+.tpl p {
+  text-wrap: pretty;
+}
+
+.tpl ::selection {
+  background-color: var(--tpl-accent-deep);
+  color: var(--tpl-on-accent);
+}
+
+.tpl :focus-visible {
+  outline: 2px solid var(--tpl-accent-deep);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   ENTRANCE
+
+   Two triggers, one keyframe.
+
+   `.tpl-enter` runs on load, for the first viewport only. `animation-fill-mode:
+   both` means the element is at its `to` state whenever the animation cannot
+   run, so a page with JavaScript disabled or a build-time render shows the
+   hero in full rather than blank.
+
+   `[data-tpl-pending]` is set by TplReveal, and ONLY on elements that are
+   already below the fold when the script runs. Nothing on screen is ever
+   hidden after paint, so there is no flash. Without JavaScript the attribute
+   is never set and every section below the fold is simply visible.
+   ========================================================================== */
+
+@keyframes tpl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--tpl-rise));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tpl .tpl-enter {
+  animation: tpl-rise var(--tpl-dur) var(--tpl-ease) var(--tpl-delay, 0ms) both;
+}
+
+.tpl [data-tpl-pending] {
+  opacity: 0;
+}
+
+.tpl [data-tpl-in] {
+  animation: tpl-rise var(--tpl-dur) var(--tpl-ease) var(--tpl-delay, 0ms) both;
+}
+
+/* The backstop. TplReveal also checks the preference before it hides
+   anything, so this catches the CSS-only entrance and nothing else should
+   ever reach it. */
+@media (prefers-reduced-motion: reduce) {
+  .tpl .tpl-enter,
+  .tpl [data-tpl-in] {
+    animation: none;
+  }
+  .tpl [data-tpl-pending] {
+    opacity: 1;
+  }
+}
+
+/* A hairline that draws in from the left. The template equivalent of the
+   site's `underline-draw`, kept here so sections never reach into globals. */
+.tpl .tpl-underline {
+  position: relative;
+}
+.tpl .tpl-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--tpl-dur) var(--tpl-ease);
+}
+.tpl .tpl-underline:hover::after,
+.tpl .tpl-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ==========================================================================
+   THE MERGED OPENING
+
+   The three mechanics that make a hero read as one composed image rather than
+   as a headline sitting next to a picture. All of them are field-wide effects
+   with nothing boxed, which is the whole point.
+   ========================================================================== */
+
+/* THE GHOST LINE.
+   Set enormous, cropped by the band's own overflow, and deliberately allowed
+   to run past both edges: type that is fully visible reads as a headline, and
+   type that is cut off reads as a texture the layout was placed on top of.
+   It is `aria-hidden` in the markup, so nothing here is announced twice. */
+.tpl .tpl-ghost {
+  color: var(--tpl-ghost);
+  font-family: var(--tpl-font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* THE SEAL.
+   One slow rotation, and the only looping animation the system allows. It
+   survives the reduced-motion backstop below by being switched off there
+   rather than sped up, because an infinite animation with a 0.01ms duration
+   is a repaint every frame forever. */
+@keyframes tpl-seal {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tpl .tpl-seal {
+  animation: tpl-seal 26s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tpl .tpl-seal {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   THE HERO AS A PHOTOGRAPH
+
+   The subject is the GROUND, not an object placed on it. Earlier this kit
+   treated the hero image as a shape sitting inside a tinted field, which reads
+   as a picture stuck in the middle of the copy no matter how its edges are
+   handled. A hero photograph has to be the surface the type is printed on.
+
+   THE PROBLEM THAT CREATES, and the reason this is a token layer rather than a
+   class on one component: white type over an unknown photograph is a coin
+   toss. A client swaps in a bright kitchen and the headline disappears. So
+   legibility here is not tuned by eye against the demo image, it is
+   GUARANTEED by arithmetic against the worst case.
+
+   Any region that carries text is covered by at least 80% ink, and the nav
+   zone by 82%. Composited over a pure white photograph, which is the palest
+   possible result, full-strength `--tpl-on-ink` clears 5.8:1 and the 85%
+   secondary clears 4.7:1 on the lightest ink in the catalog. There is no
+   photograph a client can supply that makes the type fail, because the scrim
+   decides and the image does not. `npm run check:contrast` measures exactly
+   this, against white, for every template.
+
+   The percentages started lower and were raised: at 72% the sub-headline
+   failed AA on seven of the eight templates. The check found it, not the eye.
+
+   Three layers stack in one `background`, first listed painting on top:
+     1. The nav zone, so the bar reads over any image.
+     2. The content zone, per composition, set through `--tpl-scrim`.
+     3. A foot wash, so the facts row stays readable.
+   ========================================================================== */
+
+.tpl .tpl-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--tpl-field);
+}
+
+.tpl .tpl-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Paints above the image: a pseudo-element is the last child in paint order. */
+.tpl .tpl-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--tpl-ink) 82%, transparent) 0%,
+      color-mix(in srgb, var(--tpl-ink) 40%, transparent) 13%,
+      transparent 24%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--tpl-ink) 88%, transparent) 0%,
+      color-mix(in srgb, var(--tpl-ink) 58%, transparent) 15%,
+      transparent 34%
+    ),
+    var(--tpl-scrim, none);
+}
+
+/* The directional layer. Each composition sets one, and the percentages are
+   chosen so the half of the band that carries type never drops below 72%. */
+.tpl [data-scrim="left"] {
+  --tpl-scrim: linear-gradient(
+    96deg,
+    color-mix(in srgb, var(--tpl-ink) 92%, transparent) 0%,
+    color-mix(in srgb, var(--tpl-ink) 84%, transparent) 44%,
+    color-mix(in srgb, var(--tpl-ink) 34%, transparent) 72%,
+    color-mix(in srgb, var(--tpl-ink) 16%, transparent) 100%
+  );
+}
+
+.tpl [data-scrim="right"] {
+  --tpl-scrim: linear-gradient(
+    264deg,
+    color-mix(in srgb, var(--tpl-ink) 92%, transparent) 0%,
+    color-mix(in srgb, var(--tpl-ink) 84%, transparent) 44%,
+    color-mix(in srgb, var(--tpl-ink) 34%, transparent) 72%,
+    color-mix(in srgb, var(--tpl-ink) 16%, transparent) 100%
+  );
+}
+
+/* Centred type has no quiet half to hide in, so this one is close to flat and
+   accepts that the photograph reads as atmosphere rather than as subject. */
+.tpl [data-scrim="full"] {
+  --tpl-scrim: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--tpl-ink) 82%, transparent) 0%,
+      color-mix(in srgb, var(--tpl-ink) 86%, transparent) 100%
+    ),
+    radial-gradient(
+      ellipse 78% 66% at 50% 46%,
+      color-mix(in srgb, var(--tpl-ink) 22%, transparent) 0%,
+      transparent 100%
+    );
+}
+
+.tpl [data-scrim="bottom"] {
+  --tpl-scrim: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--tpl-ink) 92%, transparent) 0%,
+    color-mix(in srgb, var(--tpl-ink) 86%, transparent) 40%,
+    color-mix(in srgb, var(--tpl-ink) 42%, transparent) 72%,
+    color-mix(in srgb, var(--tpl-ink) 20%, transparent) 100%
+  );
+}
+
+.tpl [data-scrim="top"] {
+  --tpl-scrim: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--tpl-ink) 92%, transparent) 0%,
+    color-mix(in srgb, var(--tpl-ink) 84%, transparent) 46%,
+    color-mix(in srgb, var(--tpl-ink) 36%, transparent) 74%,
+    color-mix(in srgb, var(--tpl-ink) 18%, transparent) 100%
+  );
+}
+
+/* The ghost lettering, when it is drawn over a photograph rather than a flat
+   ground. Ink at 11% is invisible on a scrimmed image, so it inverts. */
+.tpl .tpl-ghost[data-on-media] {
+  color: color-mix(in srgb, var(--tpl-on-ink) 15%, transparent);
+}

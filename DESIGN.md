@@ -8,6 +8,28 @@ build output for the key).
 
 ---
 
+## Two design worlds, and this document covers one of them
+
+**This file describes the studio's own site.** The 24 templates sold at
+`/preview/<slug>/` are a completely separate visual system with its own tokens,
+its own type, its own motion and its own rules, and they are documented in
+**`design/TEMPLATE-DIRECTION.md`**.
+
+They have to be separate. A template that inherited this site's white sheet,
+Syne headlines and square geometry would be selling the studio's identity to a
+dentist. So `src/templates/kit/tokens.css` declares a parallel `tpl-*`
+namespace, the palette arrives as inline custom properties from a config file,
+and a site utility appearing inside `src/templates/` is a review failure.
+
+If you are looking for the template system, stop reading here.
+
+**One correction owed on this document:** it records the site as *Struck &
+Assayed*, and `src/app/globals.css` has since been migrated to **SPECTRUM** (a
+white sheet, Syne / Heebo / Archivo, and a five-stop gradient accent), with a
+migration shim aliasing the old token names. The two disagree, globals.css is
+the one that ships, and rewriting this file is the studio site's own job rather
+than the template catalog's.
+
 ## Thesis
 
 A hallmark is the short row of small marks struck into finished metal that

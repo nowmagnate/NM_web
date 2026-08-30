@@ -1,0 +1,58 @@
+# Publishes each pull request to a temporary Hosting preview channel and posts
+# the URL as a PR comment. Preview channels are part of Hosting and included
+# in the free Spark plan.
+name: Preview PR
+
+on:
+  pull_request:
+
+concurrency:
+  group: hosting-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    # Pull requests from forks cannot read repository secrets, so the deploy
+    # step would fail with an unhelpful auth error. Skip them instead.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verify
+        run: npm run verify
+
+      - name: Build
+        env:
+          # Preview builds are not the canonical origin, so the site URL is
+          # left at its default rather than pointing sitemap/robots at a
+          # throwaway channel domain.
+          NEXT_PUBLIC_STRIPE_PAYMENT_LINK: ${{ vars.NEXT_PUBLIC_STRIPE_PAYMENT_LINK }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+          NEXT_PUBLIC_FORM_RELAY_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ENDPOINT }}
+        run: npm run build
+
+      - name: Deploy preview
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: nowmagnate-1f5f3
+          expires: 7d
