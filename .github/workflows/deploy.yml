@@ -22,19 +22,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
       - run: npm ci
 
-      # Same gate as `npm run verify` locally: typecheck, lint, copy audit,
-      # template contrast, typography and structure checks.
-      - name: Verify
-        run: npm run verify
 
       - name: Build
         env:
@@ -53,6 +49,11 @@ jobs:
           NEXT_PUBLIC_FORM_RELAY_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ENDPOINT }}
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
         run: npm run build
+
+      # Runs after the build on purpose: verify ends with check:templates,
+      # which inspects out/preview and fails on a clean checkout otherwise.
+      - name: Verify
+        run: npm run verify
 
       # `channelId: live` publishes to the production site. Only hosting is
       # deployed, so the Firestore rules in firebase.json are never touched.
