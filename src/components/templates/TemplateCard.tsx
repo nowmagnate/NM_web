@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Template } from "@/data/templates";
+import { hasLivePreview } from "@/templates/registry";
 import { placeholderImage } from "@/lib/placeholder";
 
 /**
@@ -10,26 +11,40 @@ import { placeholderImage } from "@/lib/placeholder";
  * separate rather than forcing one component to serve two layouts.
  */
 export function TemplateCard({ template }: { template: Template }) {
+  // Built templates show their own hero photograph and say the preview is
+  // live. Unbuilt ones keep the seeded placeholder and the concept chip, which
+  // is the rule this catalog has held since before any template existed: the
+  // page never claims to show something that has not been made.
+  const live = hasLivePreview(template.slug);
+
   return (
     <Link
       href={`/templates/${template.slug}`}
       className="group border-rule bg-bg flex flex-col overflow-hidden border transition-shadow duration-[--t-base] ease-(--ease-settle) hover:shadow-[var(--lift)]"
     >
-      <div className="relative overflow-hidden">
-        {/* TODO(asset): see design/ASSET-MANIFEST.md for the full slug list. */}
-        <Image
-          src={placeholderImage(`template-${template.slug}`, 800, 600)}
-          alt={`${template.name}, a template for a ${template.practiceType.toLowerCase()}`}
-          width={800}
-          height={600}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="aspect-4/3 w-full object-cover transition-transform duration-[--t-slow] ease-(--ease-settle) group-hover:scale-[1.03]"
-        />
-        {template.previewStatus === "comp" ? (
-          <span className="ui-label border-ink bg-bg/90 text-ink absolute top-3 left-3 border px-2.5 py-1.5 text-[10px] backdrop-blur-sm">
-            Design concept
-          </span>
-        ) : null}
+      <div className="relative aspect-4/3 overflow-hidden">
+        {live ? (
+          <Image
+            src={`/templates/${template.slug}/hero.jpg`}
+            alt={`The hero photograph from ${template.name}, a template for a ${template.practiceType.toLowerCase()}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-[--t-slow] ease-(--ease-settle) group-hover:scale-[1.03]"
+          />
+        ) : (
+          /* TODO(asset): see design/ASSET-MANIFEST.md for the full slug list. */
+          <Image
+            src={placeholderImage(`template-${template.slug}`, 800, 600)}
+            alt={`${template.name}, a template for a ${template.practiceType.toLowerCase()}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-[--t-slow] ease-(--ease-settle) group-hover:scale-[1.03]"
+          />
+        )}
+
+        <span className="ui-label border-ink bg-bg/90 text-ink absolute top-3 left-3 border px-2.5 py-1.5 text-[10px] backdrop-blur-sm">
+          {live ? "Live preview" : "Design concept"}
+        </span>
       </div>
 
       <div className="flex flex-1 flex-col p-5">

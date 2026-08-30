@@ -33,6 +33,14 @@ export default function TemplatesPage() {
               Pick one, tell us about your practice, and we customize it in 5 to 7
               business days.
             </p>
+            {/* Every template now has a live preview, so this line states that
+                rather than a count. If a template is ever added to the catalog
+                ahead of being built, its card falls back to the concept chip
+                and this sentence needs revisiting. */}
+            <p className="text-ink-muted mt-3 max-w-[48ch] text-sm leading-relaxed">
+              Every one of them has a live preview you can open and scroll right
+              now. Nothing here is a mockup.
+            </p>
           </div>
         </Section>
 

@@ -1,0 +1,66 @@
+# Builds the static export and publishes it to Firebase Hosting.
+#
+# Everything here runs on GitHub's infrastructure, and Hosting deploys are
+# included in Firebase's free Spark plan, so none of this requires Blaze.
+# That stays true only as long as the site remains a static export: adding a
+# Server Action, route handler or middleware would push the deploy onto Cloud
+# Functions, which does require the paid plan.
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A second push while a deploy is running cancels the first; the newest commit
+# is the one that should end up live.
+concurrency:
+  group: hosting-live
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+
+      - name: Build
+        env:
+          # NEXT_PUBLIC_* values are inlined into the client bundle at build
+          # time, so none of them are secret. They live in GitHub as repo
+          # variables; the fallback keeps the build green before they are set.
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://nowmagnate-1f5f3.web.app' }}
+          NEXT_PUBLIC_STRIPE_PAYMENT_LINK: ${{ vars.NEXT_PUBLIC_STRIPE_PAYMENT_LINK }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+          NEXT_PUBLIC_FORM_RELAY_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ENDPOINT }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+        run: npm run build
+
+      # Runs after the build on purpose: verify ends with check:templates,
+      # which inspects out/preview and fails on a clean checkout otherwise.
+      - name: Verify
+        run: npm run verify
+
+      # `channelId: live` publishes to the production site. Only hosting is
+      # deployed, so the Firestore rules in firebase.json are never touched.
+      - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: nowmagnate-1f5f3
+          channelId: live

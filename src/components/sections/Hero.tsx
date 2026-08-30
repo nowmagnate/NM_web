@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/Button";
-import { HeroPrism } from "@/components/sections/HeroPrism";
+import { HeroLaptop } from "@/components/sections/HeroLaptop";
 import { cta } from "@/config/site";
 import { brand, yearsInBusiness, formattedTemplatePrice } from "@/config/brand";
 import { positioning, engagementModels } from "@/data/story";
@@ -101,7 +101,7 @@ export function Hero() {
       onBlurCapture={() => setPaused(false)}
       className="relative overflow-hidden pt-[112px] lg:pt-[152px]"
     >
-      <HeroPrism />
+      <HeroLaptop />
 
       <div className="relative mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:px-[73px]">
         <div className="grid items-center gap-14 pb-20 lg:min-h-[620px] lg:grid-cols-2 lg:gap-8 lg:pb-28">
@@ -301,7 +301,13 @@ function TemplateGridFigure() {
             aria-hidden="true"
             className={cn(
               "aspect-[3/4]",
-              i === chosen ? "bg-[image:var(--spectrum)]" : "border-rule bg-bg-soft border",
+              // Outlined, not filled. `bg-bg-soft` (#fbf9f9) is a hair off
+              // the white sheet, so it costs almost nothing to drop — but it
+              // is opaque, and the hero's 3D object sits BEHIND this grid.
+              // Filled tiles chopped that object into strips between boxes
+              // that are themselves near-invisible, which read as a
+              // rendering fault rather than as depth.
+              i === chosen ? "bg-[image:var(--spectrum)]" : "border-rule border",
             )}
           />
         ))}

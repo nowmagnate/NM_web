@@ -99,9 +99,16 @@ const hexAllowlist = [
   "src/lib/brandMarkSvg.tsx",
 ];
 
+// Whole trees, rather than named files. `src/templates/` holds the token layer
+// for the 24 sold templates plus one config per instance, and the entire point
+// of a template is that it does NOT wear the studio's palette: its colours are
+// the product being sold, the same way the catalog swatches are.
+const hexAllowedPrefixes = ["src/templates/"];
+
 for (const file of files) {
   const rel = relative(ROOT, file).replace(/\\/g, "/");
   if (hexAllowlist.includes(rel)) continue;
+  if (hexAllowedPrefixes.some((prefix) => rel.startsWith(prefix))) continue;
 
   const raw = readFileSync(file, "utf8");
   const withoutComments = stripNonCopy(raw);

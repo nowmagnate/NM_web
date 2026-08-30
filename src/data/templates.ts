@@ -2,11 +2,16 @@
  * The $499 template catalog. Twenty-four templates, weighted toward
  * established professional practices in the US, Canada and Europe.
  *
- * IMPORTANT — the previews are not screenshots yet. The actual templates are a
- * separate build. Until they exist, `previewStatus` stays `"comp"` and the UI
- * renders a visible "Design concept" chip, so nothing on the page claims to be
- * a live preview of something that has not been built. Do not quietly flip
- * these to "screenshot" without a real screenshot behind them.
+ * ALL TWENTY-FOUR ARE NOW BUILT and run at `/preview/<slug>/`. The catalog
+ * decides what to show from `src/templates/registry.ts` (`hasLivePreview`),
+ * which lists the templates that actually exist, rather than from a flag in
+ * this file that somebody has to remember to update.
+ *
+ * `previewStatus` is therefore no longer read by anything. It is kept because
+ * the honest-preview rule it encoded still holds: if a template is ever added
+ * to this catalog before it is built, its card must fall back to the concept
+ * chip, and the registry is what enforces that now. Never flip a card to a
+ * live preview for a slug that has no entry in the registry.
  *
  * `palette.swatches` describes the TEMPLATE's colour direction, which is
  * content being displayed rather than site chrome. The site's own one-accent
@@ -63,7 +68,7 @@ export const templates: Template[] = [
       "Valuation enquiry",
     ],
     bestFor: "Solo agents and small teams who want listings front and centre",
-    palette: { name: "Slate & Bone", swatches: ["#1F2933", "#E8E6E1", "#C2703D"] },
+    palette: { name: "Slate & Bone", swatches: ["#1F2933", "#E3E0D8", "#C2703D"] },
     previewImage: "/templates/real-estate-agent/preview.jpg",
     previewStatus: "comp",
     featured: true,
@@ -128,7 +133,7 @@ export const templates: Template[] = [
       "Quote request",
     ],
     bestFor: "Stagers selling to both homeowners and realtors",
-    palette: { name: "Sage & Chalk", swatches: ["#2F3A34", "#F5F3EE", "#8A9A88"] },
+    palette: { name: "Sage & Chalk", swatches: ["#2F3A34", "#EAEEE8", "#8A9A88"] },
     previewImage: "/templates/home-staging/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -149,7 +154,7 @@ export const templates: Template[] = [
       "Contact and portal link",
     ],
     bestFor: "Managers balancing owner acquisition with tenant service",
-    palette: { name: "Harbour", swatches: ["#1B2A38", "#F2F4F5", "#3E7C9B"] },
+    palette: { name: "Harbour", swatches: ["#1B2A38", "#E4E9EC", "#3E7C9B"] },
     previewImage: "/templates/property-management/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -172,7 +177,7 @@ export const templates: Template[] = [
       "Location and contact",
     ],
     bestFor: "Practices whose main job online is registering new patients",
-    palette: { name: "Meadow", swatches: ["#1E3A32", "#F4F7F4", "#4E8C6A"] },
+    palette: { name: "Meadow", swatches: ["#1E3A32", "#F2F0E6", "#4E8C6A"] },
     previewImage: "/templates/family-practice/preview.jpg",
     previewStatus: "comp",
     featured: true,
@@ -237,7 +242,7 @@ export const templates: Template[] = [
       "Book",
     ],
     bestFor: "Clinics whose patients search by symptom",
-    palette: { name: "Graphite", swatches: ["#22262B", "#F1F2F4", "#C1553A"] },
+    palette: { name: "Graphite", swatches: ["#22262B", "#E4E5E8", "#C1553A"] },
     previewImage: "/templates/physiotherapy-chiropractic/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -258,7 +263,7 @@ export const templates: Template[] = [
       "Consultation",
     ],
     bestFor: "Clinics selling considered, higher-value treatments",
-    palette: { name: "Pearl", swatches: ["#2A2529", "#FAF6F5", "#B08A8A"] },
+    palette: { name: "Pearl", swatches: ["#2A2529", "#F1E7E4", "#B08A8A"] },
     previewImage: "/templates/med-spa-aesthetics/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -281,7 +286,7 @@ export const templates: Template[] = [
       "Confidential enquiry",
     ],
     bestFor: "Firms with two or more distinct practice areas",
-    palette: { name: "Oxford", swatches: ["#12233B", "#F4F5F7", "#8C6A3F"] },
+    palette: { name: "Oxford", swatches: ["#12233B", "#EDEEF1", "#8C6A3F"] },
     previewImage: "/templates/law-firm/preview.jpg",
     previewStatus: "comp",
     featured: true,
@@ -303,7 +308,7 @@ export const templates: Template[] = [
       "Consultation",
     ],
     bestFor: "Practices whose clients arrive confused about which route applies",
-    palette: { name: "Meridian Blue", swatches: ["#152A45", "#F2F5F8", "#4A7FB5"] },
+    palette: { name: "Meridian Blue", swatches: ["#152A45", "#F1EDE6", "#4A7FB5"] },
     previewImage: "/templates/immigration-attorney/preview.jpg",
     previewStatus: "comp",
     regions: ["US", "CA"],
@@ -324,7 +329,7 @@ export const templates: Template[] = [
       "Get a quote",
     ],
     bestFor: "Practices with packaged monthly pricing",
-    palette: { name: "Ledger Green", swatches: ["#16302A", "#F3F6F4", "#3F7F63"] },
+    palette: { name: "Ledger Green", swatches: ["#16302A", "#E9EFEB", "#3F7F63"] },
     previewImage: "/templates/accounting-bookkeeping/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -345,7 +350,7 @@ export const templates: Template[] = [
       "Book a first meeting",
     ],
     bestFor: "Advisors competing on transparency and fiduciary standing",
-    palette: { name: "Navy & Sand", swatches: ["#182338", "#F6F4F0", "#A8834E"] },
+    palette: { name: "Navy & Sand", swatches: ["#182338", "#E8E6E0", "#A8834E"] },
     previewImage: "/templates/financial-advisory/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -368,7 +373,7 @@ export const templates: Template[] = [
       "Private enquiry",
     ],
     bestFor: "Private practices where tone matters more than volume",
-    palette: { name: "Mist", swatches: ["#2A3038", "#F4F5F6", "#7C8FA0"] },
+    palette: { name: "Mist", swatches: ["#2A3038", "#E8ECEF", "#7C8FA0"] },
     previewImage: "/templates/therapy-counseling/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -476,7 +481,7 @@ export const templates: Template[] = [
       "Start a project",
     ],
     bestFor: "Consultancies selling on thinking rather than deliverables",
-    palette: { name: "Ink & Citrus", swatches: ["#17181A", "#F4F4F2", "#C8A415"] },
+    palette: { name: "Ink & Citrus", swatches: ["#17181A", "#E8E7E1", "#C8A415"] },
     previewImage: "/templates/design-consultancy/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -520,7 +525,7 @@ export const templates: Template[] = [
       "Request a site visit",
     ],
     bestFor: "Design-build firms rather than maintenance-only operators",
-    palette: { name: "Fern", swatches: ["#1D2B21", "#F3F6F1", "#5E8C4E"] },
+    palette: { name: "Fern", swatches: ["#1D2B21", "#EAF0E6", "#5E8C4E"] },
     previewImage: "/templates/landscape-design-build/preview.jpg",
     previewStatus: "comp",
     regions: ALL,
@@ -541,7 +546,7 @@ export const templates: Template[] = [
       "Request a quote",
     ],
     bestFor: "Contractors competing against cheaper, less credentialed bids",
-    palette: { name: "Workshop", swatches: ["#1C1E20", "#F2F1EF", "#C77A2E"] },
+    palette: { name: "Workshop", swatches: ["#1C1E20", "#E6E4E0", "#C77A2E"] },
     previewImage: "/templates/remodeling-contractor/preview.jpg",
     previewStatus: "comp",
     regions: ALL,

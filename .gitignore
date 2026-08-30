@@ -20,3 +20,8 @@ firebase-debug.log
 
 npm-debug.log*
 yarn-error.log*
+
+# Service account keys - never commit these.
+fb-secret-key/
+*serviceaccount*.json
+*adminsdk*.json
