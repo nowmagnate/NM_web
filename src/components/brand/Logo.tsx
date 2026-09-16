@@ -1,26 +1,22 @@
 import { brand } from "@/config/brand";
+import { Monogram } from "@/components/brand/Monogram";
 import { cn } from "@/lib/cn";
 
 /**
  * The ONLY component that renders the company mark or name as a graphic.
  *
- * This file and `src/config/brand.ts` are the two places a rename touches.
- * The mark is a maker's punch: a struck pocket with the initial cut into it.
- * `currentColor` throughout, so one definition serves every context.
+ * This file and `src/config/brand.ts` are the two places a rename touches,
+ * and the mark survives one for free: the initial is derived from the brand's
+ * own maker's mark rather than typed in, so renaming the company restrikes
+ * the logo instead of leaving the old letter behind.
  *
- * When the real logo arrives, replace the <svg> in `Mark` (or point it at
- * /brand/logo-mark.svg) and leave everything else alone. The filenames in
- * public/brand/ are fixed for exactly this reason.
+ * The placeholder punch that stood here until the identity existed is gone.
+ * The mark is now the real one from the logo system, set rather than drawn;
+ * `Monogram.tsx` records how and why.
  */
 
 type LogoVariant = "lockup" | "wordmark" | "mark";
 type LogoSize = "sm" | "md" | "lg";
-
-const markSize: Record<LogoSize, string> = {
-  sm: "h-7 w-7",
-  md: "h-9 w-9",
-  lg: "h-12 w-12",
-};
 
 const wordSize: Record<LogoSize, string> = {
   sm: "text-[15px]",
@@ -29,39 +25,23 @@ const wordSize: Record<LogoSize, string> = {
 };
 
 /**
- * A square carrying the diagonal of the initial, stroked in the spectrum.
+ * The parent mark, from the logo system's own export.
  *
- * The gradient id is a fixed string rather than a `useId()`. Two logos on one
- * page (header and footer) therefore emit the same id and the first
- * definition wins for both — which is correct here, because both definitions
- * are identical. A hook would also make this a Client Component, and the
- * footer renders on the server. Deliberately one simple geometric mark: it has
- * to survive being rendered at 28px in a nav rail and as a favicon.
+ * Its initial is a flat indigo rather than the site's spectrum ramp, and that
+ * is the identity's decision rather than this site's: the ramp was tried here
+ * and did not survive the size the mark is actually used at. At 36px the
+ * initial is a 12x14px box, and a five-stop gradient compressed into a 17px
+ * diagonal reads as a blue-violet smudge, not as the accent. The flat colour
+ * the design system settled on is `#5e5ef0`, which is exactly the midpoint of
+ * this site's spectrum, so the mark still belongs to the page without trying
+ * to reproduce the ramp inside a letterform.
  */
-const GRADIENT_ID = "logo-spectrum";
+const PARENT_MARK = "/brand/NowMagnate-icon-indigo-512.png";
 
-function Mark({ className }: { className?: string }) {
-  return (
-    <span className={cn("grid shrink-0 place-items-center", className)}>
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-full w-full">
-        <defs>
-          <linearGradient id={GRADIENT_ID} x1="0" y1="24" x2="24" y2="0">
-            <stop offset="0%" stopColor="var(--spec-1)" />
-            <stop offset="50%" stopColor="var(--spec-3)" />
-            <stop offset="100%" stopColor="var(--spec-5)" />
-          </linearGradient>
-        </defs>
-        <rect x="0.9" y="0.9" width="22.2" height="22.2" stroke="currentColor" />
-        <path
-          d="M6.5 17.5V7L17.5 17V6.5"
-          stroke={`url(#${GRADIENT_ID})`}
-          strokeWidth="2.4"
-          strokeLinecap="square"
-          strokeLinejoin="miter"
-        />
-      </svg>
-    </span>
-  );
+const tileSize: Record<LogoSize, number> = { sm: 28, md: 36, lg: 48 };
+
+function Mark({ size }: { size: LogoSize }) {
+  return <Monogram src={PARENT_MARK} size={tileSize[size]} />;
 }
 
 export function Logo({
@@ -82,7 +62,7 @@ export function Logo({
         role="img"
         aria-label={label}
       >
-        <Mark className={markSize[size]} />
+        <Mark size={size} />
       </span>
     );
   }
@@ -107,7 +87,7 @@ export function Logo({
       role="img"
       aria-label={label}
     >
-      <Mark className={markSize[size]} />
+      <Mark size={size} />
       <span
         aria-hidden="true"
         className={cn("font-display font-semibold tracking-[-0.01em]", wordSize[size])}
