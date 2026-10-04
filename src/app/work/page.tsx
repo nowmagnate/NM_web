@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
+import { ProjectsTimeline } from "@/components/sections/ProjectsTimeline";
 import { caseStudies } from "@/data/case-studies";
 import { cta } from "@/config/site";
 import { pageMetadata } from "@/lib/metadata";
@@ -34,7 +35,7 @@ export default function WorkPage() {
             <p className="text-ink-muted mt-5 text-lg leading-relaxed">
               {hasWork
                 ? "A selection of what we've shipped."
-                : "Most of it sits behind an NDA. Here's what we can show."}
+                : "Most of it sits behind an NDA, so there are no client names here. Below is the kind of work we have delivered, scattered across the years."}
             </p>
           </div>
         </Section>
@@ -74,6 +75,8 @@ export default function WorkPage() {
             </div>
           )}
         </Section>
+
+        <ProjectsTimeline />
       </main>
       <Footer />
     </>
