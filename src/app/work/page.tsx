@@ -2,10 +2,8 @@ import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
-import { Button } from "@/components/ui/Button";
 import { ProjectsTimeline } from "@/components/sections/ProjectsTimeline";
 import { caseStudies } from "@/data/case-studies";
-import { cta } from "@/config/site";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
@@ -27,21 +25,21 @@ export default function WorkPage() {
     <>
       <Header />
       <main id="main">
-        <Section spacing="compact" className="pt-32">
-          <div className="max-w-[52ch]">
-            <h1 className="font-display text-4xl leading-[1.05] md:text-5xl">
-              Selected work.
-            </h1>
-            <p className="text-ink-muted mt-5 text-lg leading-relaxed">
-              {hasWork
-                ? "A selection of what we've shipped."
-                : "Most of it sits behind an NDA, so there are no client names here. Below is the kind of work we have delivered, scattered across the years."}
-            </p>
-          </div>
-        </Section>
+        {hasWork && (
+          <Section spacing="compact" className="pt-32">
+            <div className="max-w-[52ch]">
+              <h1 className="font-display text-4xl leading-[1.05] md:text-5xl">
+                Selected work.
+              </h1>
+              <p className="text-ink-muted mt-5 text-lg leading-relaxed">
+                A selection of what we&rsquo;ve shipped.
+              </p>
+            </div>
+          </Section>
+        )}
 
-        <Section spacing="compact" className="pt-0">
-          {hasWork ? (
+        {hasWork && (
+          <Section spacing="compact" className="pt-0">
             <div className="grid grid-cols-1 gap-px md:grid-cols-2">
               {caseStudies.map((study) => (
                 <Link
@@ -59,24 +57,10 @@ export default function WorkPage() {
                 </Link>
               ))}
             </div>
-          ) : (
-            <div className="border-rule border px-8 py-16 text-center md:px-16 md:py-20">
-              <h2 className="spectrum-text font-display mx-auto max-w-[26ch] text-3xl leading-[1.08] text-balance md:text-4xl">
-                Nine years of client projects, almost all under NDA.
-              </h2>
-              <p className="text-ink-muted mx-auto mt-5 max-w-[54ch] leading-relaxed">
-                We are working through permissions with clients who have agreed to a
-                public write-up. Until those are live, the honest answer is to ask
-                directly, and we will walk you through relevant work on a call.
-              </p>
-              <div className="mt-9 flex justify-center">
-                <Button href={cta.primary.href}>{cta.primary.label}</Button>
-              </div>
-            </div>
-          )}
-        </Section>
+          </Section>
+        )}
 
-        <ProjectsTimeline />
+        <ProjectsTimeline lead={!hasWork} />
       </main>
       <Footer />
     </>

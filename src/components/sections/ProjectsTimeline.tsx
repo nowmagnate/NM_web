@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
+import { ScreenZoom } from "./ScreenZoom";
 import {
   projects,
   type DeviceKind,
@@ -15,149 +15,203 @@ import {
 /**
  * Anonymized project timeline for /work.
  *
- * Mobile: one column, the line down the left edge. Desktop: the line runs down
- * the centre and entries alternate sides with uneven gaps, so the projects
- * read as scattered along it rather than ticked off at even intervals. The
- * line carries no dates and no labels.
+ * Desktop: one hairline down the centre, entries alternating sides (the first
+ * on the right), each with a struck square on the line. Every entry reads in
+ * the same order: title and one-line argument, the screens, features, stack.
+ *
+ * The alternation is done with floats on purpose. Entries stay in document
+ * order, need no JavaScript and no measuring, and a float starts as high as
+ * the opposite side's last entry allows. A single margin on the second entry
+ * pulls the two columns half an entry out of step, which is what keeps them
+ * overlapping down the page instead of ticking off one after another.
+ *
+ * Mobile: the line stays on the left edge and every entry sits to its right.
  *
  * Screens: a file at `public/projects/<id>/screen-<n>.webp` is picked up at
  * build time (this is a server component, and the site is a static export), so
  * real screenshots drop in with no code change. Without one, a wireframe
- * placeholder frame of the same size is drawn.
+ * placeholder frame of the same size is drawn. Real screens can be enlarged
+ * (see ScreenZoom); placeholders cannot.
  */
 
-/** Intrinsic sizes for screenshots, per device. Files should match these ratios. */
+/** Intrinsic sizes for screenshots, per device. Files may be 2x these; only the ratio matters. */
 const SIZES: Record<DeviceKind, { width: number; height: number }> = {
   phone: { width: 300, height: 600 },
   "phone-landscape": { width: 600, height: 300 },
   desktop: { width: 640, height: 400 },
 };
 
-const GAPS = { tight: "md:mt-0", normal: "md:mt-10", loose: "md:mt-20" } as const;
+/**
+ * Entries that start roughly half an entry below the opposite side's last
+ * one. Entry 1 sets the stagger up; the two columns then drift as entry
+ * heights differ, so entry 9 pulls them back out of step. Re-check these
+ * indices if entries are added or their content changes length.
+ */
+const STAGGER = new Set([1, 9]);
 
 function screenSrc(project: Project, index: number): string | null {
   const rel = `projects/${project.id}/screen-${index + 1}.webp`;
   return existsSync(join(process.cwd(), "public", rel)) ? `/${rel}` : null;
 }
 
-export function ProjectsTimeline() {
+/** `lead` makes this the first thing on the page: top clearance for the header and the h1. */
+export function ProjectsTimeline({ lead = false }: { lead?: boolean }) {
+  const Heading = lead ? "h1" : "h2";
   return (
-    <Section id="projects" spacing="compact" className="pt-0">
-      <div className="max-w-[52ch]">
-        <h2 className="font-display text-3xl leading-[1.08] md:text-4xl">
+    <Section id="projects" spacing="compact" className={lead ? "pt-[20vh] md:pt-[20vh]" : "pt-8 md:pt-12"}>
+      <div className="mx-auto text-center">
+        <Heading className="spectrum-text font-display mx-auto max-w-[26ch] text-3xl leading-[1.08] text-balance md:text-4xl">
           Projects over the years.
-        </h2>
-        <p className="text-ink-muted mt-4 leading-relaxed">
-          The kinds of products we have built over the years, with the names taken off.
+        </Heading>
+        <p className="text-ink-muted mx-auto mt-5 max-w-[54ch] leading-relaxed">
+          Most of it sits behind an NDA, so there are no client names here. Below is the
+          kind of work we have delivered over the years.
         </p>
       </div>
 
-      <ol className="relative mt-14 md:mt-20">
-        {/* The line. Left edge on mobile, centre on desktop. */}
+      <ol className="relative mt-14 flow-root md:mt-20">
         <span
           aria-hidden="true"
-          className="bg-rule-strong absolute top-0 bottom-0 left-[7px] w-px md:left-1/2 md:-translate-x-1/2"
+          className="bg-rule-strong absolute top-2 bottom-2 left-[7px] w-px md:left-1/2 md:-translate-x-1/2"
         />
         {projects.map((project, i) => (
-          <Reveal as="li" key={project.id} className={cn("relative pb-14 md:pb-0")}>
-            <Entry project={project} first={i === 0} />
-          </Reveal>
+          <Entry key={project.id} project={project} index={i} />
         ))}
       </ol>
     </Section>
   );
 }
 
-function Entry({ project, first }: { project: Project; first: boolean }) {
-  const right = project.side === "right";
+function Entry({ project, index }: { project: Project; index: number }) {
+  // The first project starts on the right; the rest alternate.
+  const right = index % 2 === 0;
 
   return (
-    <div
+    <Reveal
+      as="li"
       className={cn(
-        "relative pl-10 md:w-1/2 md:pl-0",
-        right ? "md:ml-[50%] md:pl-14" : "md:pr-14",
-        !first && GAPS[project.gap],
-        first && "md:mt-0",
+        "relative pb-14 pl-10 md:w-1/2 md:pb-16",
+        // `clear` keeps a float on its own side when the other side's bottom is
+        // a few pixels lower: without it the browser drops it into the gap.
+        right
+          ? "md:clear-right md:float-right md:pl-12"
+          : "md:clear-left md:float-left md:pr-12 md:pl-0",
+        STAGGER.has(index) && "md:mt-[21rem]",
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
-          "border-ink bg-bg absolute top-2 left-0 h-[15px] w-[15px] border-2",
+          "border-ink bg-bg absolute top-1.5 left-0 h-[15px] w-[15px] border-2",
           right ? "md:-left-[8px]" : "md:right-[-8px] md:left-auto",
         )}
       />
 
-      <p className="ui-label text-ink-faint text-[10px]">
+      <p className="ui-label text-ink-faint flex items-center gap-3 text-[10px]">
+        <span className="spectrum-text font-display text-[20px] font-semibold tracking-normal normal-case">
+          {String(index + 1).padStart(2, "0")}
+        </span>
         {project.platforms.join(" · ")}
       </p>
-      <h3 className="font-display mt-2 text-2xl leading-[1.1] md:text-[28px]">
+      <h3 className="font-display mt-2.5 text-[clamp(1.4rem,2vw,1.7rem)] leading-[1.1] font-semibold tracking-[-0.01em]">
         {project.category}
       </h3>
-      <p className="text-ink-muted mt-3 max-w-[56ch] leading-relaxed">
+      <p className="text-ink-muted mt-3 max-w-[52ch] text-[15px] leading-[1.65]">
         {project.utility}
       </p>
 
-      <div className="mt-5 flex flex-wrap items-end gap-3">
-        {project.screens.map((screen, n) => (
-          <Frame key={n} screen={screen} src={screenSrc(project, n)} />
-        ))}
-      </div>
+      <Stage project={project} />
 
-      <h4 className="ui-label text-ink-faint mt-5 text-[10px]">Features</h4>
-      <ul className="text-ink-soft mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] leading-snug">
+      <h4 className="ui-label text-ink-faint mt-6 text-[10px]">Features</h4>
+      <ul className="border-rule mt-3 grid border-t sm:grid-cols-2 sm:gap-x-6">
         {project.features.map((f) => (
-          <li key={f}>{f}</li>
-        ))}
-      </ul>
-
-      <h4 className="ui-label text-ink-faint mt-5 text-[10px]">Stack</h4>
-      <ul className="mt-2 flex flex-wrap gap-2">
-        {project.stack.map((s) => (
-          <li key={s} className="border-rule text-ink-soft border px-2 py-1 text-[13px]">
-            {s}
+          <li
+            key={f}
+            className="border-rule text-ink-soft border-b py-1.5 text-[13.5px] leading-snug"
+          >
+            {f}
           </li>
         ))}
       </ul>
-    </div>
+
+      <h4 className="ui-label text-ink-faint mt-6 text-[10px]">Stack</h4>
+      <ul className="mt-3 flex flex-wrap gap-1.5">
+        {project.stack.map((t) => (
+          <li key={t} className="border-rule text-ink-muted border px-2 py-1 text-[12px]">
+            {t}
+          </li>
+        ))}
+      </ul>
+    </Reveal>
   );
 }
 
-/* ------------------------------------------------------------------ frames */
+/* ------------------------------------------------------------------ stage */
 
-const FRAME_WIDTH: Record<DeviceKind, string> = {
-  phone: "w-[112px] md:w-[96px]",
-  "phone-landscape": "w-[200px] md:w-[170px]",
-  desktop: "w-[160px] md:w-[185px]",
-};
-
-const FRAME_RATIO: Record<DeviceKind, string> = {
+/**
+ * Relative weight of each device when frames share the stage. Frames sit on
+ * equal heights by default (weight = aspect ratio); phones are lightened a
+ * little so they stand taller than the desktop frames beside them instead of
+ * matching them. Below `md` the row scrolls sideways at fixed widths instead.
+ */
+const WEIGHT: Record<DeviceKind, number> = { phone: 0.62, "phone-landscape": 2, desktop: 1.6 };
+const BASE_W: Record<DeviceKind, number> = { phone: 120, "phone-landscape": 240, desktop: 220 };
+const RATIO: Record<DeviceKind, string> = {
   phone: "aspect-[1/2]",
   "phone-landscape": "aspect-[2/1]",
   desktop: "aspect-[8/5]",
 };
+
+function Stage({ project }: { project: Project }) {
+  const onlyPhones = project.screens.every((s) => s.device === "phone");
+  return (
+    <div className="border-rule bg-bg-soft mt-6 border p-3 sm:p-4">
+      <div
+        className={cn(
+          "-mx-1 flex items-end gap-3 overflow-x-auto px-1 pb-1 md:mx-0 md:gap-3 md:overflow-visible md:px-0",
+          onlyPhones && "md:mx-auto md:max-w-[330px]",
+        )}
+      >
+        {project.screens.map((screen, n) => (
+          <Frame key={n} screen={screen} src={screenSrc(project, n)} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Frame({ screen, src }: { screen: ProjectScreen; src: string | null }) {
   const { device } = screen;
   const phone = device !== "desktop";
 
   return (
-    <figure className={cn("shrink-0", FRAME_WIDTH[device])}>
+    <figure
+      className="w-[var(--bw)] shrink-0 md:w-auto md:min-w-0 md:shrink md:[flex:var(--g)_1_0%]"
+      style={{ "--bw": `${BASE_W[device]}px`, "--g": WEIGHT[device] } as React.CSSProperties}
+    >
       <div
         className={cn(
-          "border-ink-soft bg-bg-mute relative overflow-hidden border-2 shadow-[var(--lift-sm)]",
-          phone ? "rounded-[14px]" : "rounded-[3px] border-t-[10px]",
-          FRAME_RATIO[device],
+          "border-ink bg-bg-mute relative overflow-hidden shadow-[var(--lift-sm)]",
+          phone ? "rounded-[12px] border-2" : "rounded-[3px] border-[1.5px]",
+          RATIO[device],
         )}
       >
+        {!phone && (
+          <span
+            aria-hidden="true"
+            className="bg-ink pointer-events-none absolute inset-x-0 top-0 z-10 flex h-[6px] items-center gap-[2px] px-1"
+          >
+            {[0, 1, 2].map((d) => (
+              <i key={d} className="bg-bg/60 block h-[2px] w-[2px] rounded-full" />
+            ))}
+          </span>
+        )}
         {src ? (
-          <Image
+          <ScreenZoom
             src={src}
             alt={screen.alt}
             width={SIZES[device].width}
             height={SIZES[device].height}
-            unoptimized
-            loading="lazy"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -166,6 +220,9 @@ function Frame({ screen, src }: { screen: ProjectScreen; src: string | null }) {
           </div>
         )}
       </div>
+      <figcaption className="ui-label text-ink-faint mt-2 text-[8.5px] tracking-[0.14em]">
+        {screen.label}
+      </figcaption>
     </figure>
   );
 }
