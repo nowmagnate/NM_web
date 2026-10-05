@@ -100,7 +100,7 @@ requires credentials and billing decisions only you can make.
 3. In the new project: **Build → Firestore Database → Create database**.
    Start in production mode — `firestore.rules` in this repo is the real
    rule set, not the wide-open test-mode default.
-4. **Build → App Check → Get started → reCAPTCHA v3** for a Web app, and
+4. **Build → App Check → Get started → reCAPTCHA Enterprise** for a Web app, and
    register one if you haven't yet (**Project settings → General → Your
    apps → Add app → Web**). Copy the site key.
 5. **Project settings → General → Your apps → SDK setup and configuration**
