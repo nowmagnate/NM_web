@@ -32,6 +32,15 @@ jobs:
       - run: npm ci
 
 
+      # next/font/google downloads font files at build time and caches them
+      # here, so most builds make no request to Google at all.
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
       - name: Build
         env:
           # NEXT_PUBLIC_* values are inlined into the client bundle at build
@@ -49,7 +58,18 @@ jobs:
           NEXT_PUBLIC_FORM_RELAY_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ENDPOINT }}
           NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY }}
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
-        run: npm run build
+        # The Google Fonts download occasionally returns an unparseable
+        # response and crashes the build ("Cannot read properties of null
+        # (reading '1')" in next/font). That is transient, so retry the build
+        # a couple of times before calling it a failure. A real compile error
+        # fails all three attempts and still fails the job.
+        run: |
+          for attempt in 1 2 3; do
+            npm run build && exit 0
+            echo "Build attempt $attempt failed, retrying in 15s"
+            sleep 15
+          done
+          exit 1
 
       # Runs after the build on purpose: verify ends with check:templates,
       # which inspects out/preview and fails on a clean checkout otherwise.
