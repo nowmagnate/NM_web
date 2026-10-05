@@ -47,4 +47,14 @@ export const formRelayEndpoint = process.env.NEXT_PUBLIC_FORM_RELAY_ENDPOINT;
  */
 export const formRelayAccessKey = process.env.NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY;
 
+/**
+ * hCaptcha sitekey. This is the sitekey Web3Forms publishes for free-plan
+ * forms (public by design, it appears in their docs and in every page that
+ * uses it); a paid plan can register its own key pair instead. The captcha is
+ * checked by Web3Forms, which has to have hCaptcha switched on for the form in
+ * its dashboard. It only guards the email relay, so it is required exactly
+ * when the relay is configured (`formRelayConfigured`).
+ */
+export const hcaptchaSiteKey = "50b2fe65-b00b-4b9e-ad62-3ba471098be2";
+
 export const formRelayConfigured = Boolean(formRelayEndpoint);
