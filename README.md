@@ -58,6 +58,7 @@ redeploy, not a config change on a running server.
 | `NEXT_PUBLIC_FIREBASE_*` | Lead forms render and validate fully, but show a "not fully wired up yet" error on submit with a mailto fallback |
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | App Check stays uninitialized; Firestore rules reject all writes until this and Firebase project config are both set |
 | `NEXT_PUBLIC_FORM_RELAY_ENDPOINT` | No email ping on a new lead; the Firestore document is still the record of truth, checked from the console |
+| `NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY` | Web3Forms only. Without it a Web3Forms endpoint rejects the ping (the lead is still saved) |
 
 ## Firestore rules
 

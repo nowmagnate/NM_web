@@ -39,4 +39,12 @@ export const appCheckConfigured = Boolean(recaptchaSiteKey);
  * enforced in `src/lib/leads.ts`, not here.
  */
 export const formRelayEndpoint = process.env.NEXT_PUBLIC_FORM_RELAY_ENDPOINT;
+/**
+ * Web3Forms identifies the form by a public access key sent in the request
+ * body (it is safe to expose, and is restricted to the receiving address and
+ * allowed domains in the Web3Forms dashboard). Formspree identifies the form
+ * by the endpoint URL itself, so leave this empty when using Formspree.
+ */
+export const formRelayAccessKey = process.env.NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY;
+
 export const formRelayConfigured = Boolean(formRelayEndpoint);
