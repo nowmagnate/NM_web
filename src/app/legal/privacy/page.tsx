@@ -38,8 +38,8 @@ export default function PrivacyPolicyPage() {
         <p className="mt-4">Automatically, from your browser:</p>
         <ul>
           <li>
-            Signals used by Google reCAPTCHA to distinguish human visitors from automated
-            ones on our forms
+            Signals used by Google reCAPTCHA and hCaptcha to distinguish human visitors
+            from automated ones on our forms
           </li>
           <li>
             Standard analytics data (pages viewed, general location, device type), only if
@@ -121,8 +121,8 @@ export default function PrivacyPolicyPage() {
       <div>
         <h2>Cookies</h2>
         <p>
-          This site uses only the cookies strictly needed to run reCAPTCHA (bot protection
-          on forms) and, where enabled, basic analytics. We do not use advertising or
+          This site uses only the cookies strictly needed to run reCAPTCHA and hCaptcha
+          (bot protection on forms) and, where enabled, basic analytics. We do not use advertising or
           cross-site tracking cookies.
         </p>
       </div>

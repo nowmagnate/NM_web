@@ -4,6 +4,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
 import { Field, Input, Select, Honeypot } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { HCaptcha } from "./HCaptcha";
 import { useLeadForm } from "@/lib/useLeadForm";
 import {
   briefSchema,
@@ -45,7 +46,10 @@ export function BriefForm() {
   const [prefillSlug, setPrefillSlug] = useState("");
   const prefillTemplate = prefillSlug ? getTemplate(prefillSlug) : undefined;
 
-  const { status, errors, formError, submit, reset } = useLeadForm(briefSchema, "brief");
+  const { status, errors, formError, submit, reset, captcha } = useLeadForm(
+    briefSchema,
+    "brief",
+  );
   const [values, setValues] = useState(emptyForm);
 
   useEffect(() => {
@@ -273,6 +277,15 @@ export function BriefForm() {
           </a>
           .
         </div>
+      ) : null}
+
+      {captcha.required ? (
+        <HCaptcha
+          siteKey={captcha.siteKey}
+          onToken={captcha.onToken}
+          nonce={captcha.nonce}
+          error={captcha.error}
+        />
       ) : null}
 
       <div>

@@ -26,6 +26,7 @@ export function relayPayload(
   kind: LeadKind,
   data: Record<string, unknown>,
   accessKey: string | undefined = formRelayAccessKey,
+  captchaToken?: string,
 ) {
   const name = typeof data.name === "string" ? data.name : "";
   const email = typeof data.email === "string" ? data.email : "";
@@ -41,6 +42,8 @@ export function relayPayload(
     replyto: email,
     _subject: subject,
     _replyto: email,
+    // Checked by Web3Forms when hCaptcha is on for the form. Never stored.
+    ...(captchaToken ? { "h-captcha-response": captchaToken } : {}),
     kind,
     ...data,
   };
@@ -53,13 +56,17 @@ export function relayPayload(
  * and a flaky third-party relay is not a reason to tell someone their lead
  * did not go through when it did.
  */
-async function pingRelay(kind: LeadKind, data: Record<string, unknown>) {
+async function pingRelay(
+  kind: LeadKind,
+  data: Record<string, unknown>,
+  captchaToken?: string,
+) {
   if (!formRelayConfigured || !formRelayEndpoint) return;
   try {
     await fetch(formRelayEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(relayPayload(kind, data)),
+      body: JSON.stringify(relayPayload(kind, data, formRelayAccessKey, captchaToken)),
       keepalive: true,
     });
   } catch {
@@ -75,6 +82,7 @@ async function pingRelay(kind: LeadKind, data: Record<string, unknown>) {
 export async function submitLead(
   kind: LeadKind,
   data: Record<string, unknown>,
+  captchaToken?: string,
 ): Promise<LeadResult> {
   if (!firebaseConfigured) return { ok: false, reason: "not-configured" };
 
@@ -93,6 +101,6 @@ export async function submitLead(
     return { ok: false, reason: "write-failed" };
   }
 
-  void pingRelay(kind, data);
+  void pingRelay(kind, data, captchaToken);
   return { ok: true };
 }
