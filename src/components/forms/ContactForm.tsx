@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
 import { Field, Input, Textarea, Select, Honeypot } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { HCaptcha } from "./HCaptcha";
 import { useLeadForm } from "@/lib/useLeadForm";
 import {
   contactSchema,
@@ -29,7 +30,7 @@ const emptyForm: Record<keyof ContactFormData, string> = {
  * that keeps the user's input intact so nothing is lost on retry.
  */
 export function ContactForm() {
-  const { status, errors, formError, submit, reset } = useLeadForm(
+  const { status, errors, formError, submit, reset, captcha } = useLeadForm(
     contactSchema,
     "contact",
   );
@@ -182,6 +183,15 @@ export function ContactForm() {
           </a>
           .
         </div>
+      ) : null}
+
+      {captcha.required ? (
+        <HCaptcha
+          siteKey={captcha.siteKey}
+          onToken={captcha.onToken}
+          nonce={captcha.nonce}
+          error={captcha.error}
+        />
       ) : null}
 
       <div>
