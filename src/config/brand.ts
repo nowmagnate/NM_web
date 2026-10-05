@@ -30,6 +30,9 @@ export const brand = {
   email: {
     // TODO: replace with real addresses on the registered domain.
     sales: "hello@nowmagnate.com",
+    // Where the website forms send enquiries (the Web3Forms key is created for
+    // this address) and what their error message tells people to write to.
+    enquiry: "enquiry@nowmagnate.com",
     support: "support@nowmagnate.com",
   },
 

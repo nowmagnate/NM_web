@@ -268,8 +268,8 @@ export function BriefForm() {
           className="bg-danger-wash text-danger border-danger/30 border px-4 py-3 text-sm"
         >
           {formError} You can reach us directly at{" "}
-          <a href={`mailto:${brand.email.sales}`} className="font-medium underline">
-            {brand.email.sales}
+          <a href={`mailto:${brand.email.enquiry}`} className="font-medium underline">
+            {brand.email.enquiry}
           </a>
           .
         </div>
