@@ -2,7 +2,7 @@
 
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import {
   firebaseConfig,
   firebaseConfigured,
@@ -27,10 +27,13 @@ function getFirebaseApp(): FirebaseApp | null {
     app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
   }
 
+  // The key is a reCAPTCHA Enterprise key and App Check is registered with
+  // the Enterprise provider in the Firebase console. A v3 provider against an
+  // Enterprise key is rejected with a 400 and every lead write then fails.
   // App Check attaches itself to the app instance; only needs doing once.
   if (appCheckConfigured && !appCheckStarted) {
     initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(recaptchaSiteKey!),
+      provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey!),
       isTokenAutoRefreshEnabled: true,
     });
     appCheckStarted = true;

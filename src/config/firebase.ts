@@ -23,7 +23,7 @@ export const firebaseConfigured = Boolean(
 );
 
 /**
- * reCAPTCHA v3 site key for Firebase App Check. Free tier. Without it, App
+ * reCAPTCHA Enterprise site key for Firebase App Check. Free tier. Without it, App
  * Check stays uninitialized — fine for local development against the
  * emulator, but the deployed Firestore rules require a valid App Check token,
  * so production writes need this set.
