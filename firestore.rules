@@ -9,8 +9,9 @@ rules_version = '2';
  * So the rules do the job a backend would normally do:
  *   - create-only. No one reads, updates, or deletes a lead from the client,
  *     ever. Leads are read from the Firebase console.
- *   - App Check required, so a request has to come from this app's own
- *     compiled client, not a hand-crafted request from a script.
+ *   - App Check required, enforced by the service (console setting), so a
+ *     request has to come from this app's own compiled client, not a
+ *     hand-crafted request from a script.
  *   - Every field is type- and length-checked against what the two forms in
  *     `src/lib/schemas.ts` can actually produce, so a crafted payload can't
  *     write something the UI never would.
@@ -23,14 +24,13 @@ service cloud.firestore {
     match /leads/{leadId} {
       allow read, update, delete: if false;
 
-      // `request.app != null` is populated only when App Check is both
-      // configured client-side (NEXT_PUBLIC_RECAPTCHA_SITE_KEY) AND
-      // enforcement is turned on for Firestore in the Firebase console.
-      // Until both are true, this stays null and every create is rejected —
-      // fail closed rather than accept public writes with no anti-abuse
-      // check in front of them.
-      allow create: if request.app != null
-        && isValidLead(request.resource.data);
+      // App Check is not checked here. Cloud Firestore enforces it in the
+      // service, before the rules run, once enforcement is turned on for
+      // Firestore in the Firebase console (it is). A request with no valid
+      // App Check token never reaches this rule. An earlier version tested
+      // `request.app != null` here; that field is never populated for Firestore,
+      // so it rejected every legitimate write too.
+      allow create: if isValidLead(request.resource.data);
     }
 
     // Deny everything else by default.
