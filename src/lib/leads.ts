@@ -2,6 +2,7 @@
 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getDb } from "./firebaseClient";
+import { brand } from "@/config/brand";
 import {
   firebaseConfigured,
   formRelayEndpoint,
@@ -36,7 +37,7 @@ export function relayPayload(
   return {
     ...(accessKey ? { access_key: accessKey } : {}),
     subject,
-    from_name: name || "NowMagnate website",
+    from_name: name || `${brand.shortName} website`,
     replyto: email,
     _subject: subject,
     _replyto: email,
