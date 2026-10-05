@@ -45,6 +45,7 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ vars.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
           NEXT_PUBLIC_FORM_RELAY_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ENDPOINT }}
+          NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY: ${{ vars.NEXT_PUBLIC_FORM_RELAY_ACCESS_KEY }}
         run: npm run build
 
       # Runs after the build on purpose: verify ends with check:templates,

@@ -5,6 +5,7 @@ import { getDb } from "./firebaseClient";
 import {
   firebaseConfigured,
   formRelayEndpoint,
+  formRelayAccessKey,
   formRelayConfigured,
 } from "@/config/firebase";
 
@@ -12,6 +13,37 @@ export type LeadKind = "contact" | "brief";
 
 export type LeadResult =
   { ok: true } | { ok: false; reason: "not-configured" | "write-failed" };
+
+/**
+ * The body both supported relays understand. Web3Forms wants `access_key`,
+ * `subject`, `from_name` and `replyto`; Formspree reads `_subject` and
+ * `_replyto`. Each ignores the other's keys, so one payload serves both and
+ * the email arrives with a readable subject and a Reply that goes to the
+ * enquirer. `accessKey` is injectable so the shape can be tested.
+ */
+export function relayPayload(
+  kind: LeadKind,
+  data: Record<string, unknown>,
+  accessKey: string | undefined = formRelayAccessKey,
+) {
+  const name = typeof data.name === "string" ? data.name : "";
+  const email = typeof data.email === "string" ? data.email : "";
+  const subject =
+    kind === "brief"
+      ? `New template brief${name ? ` from ${name}` : ""}`
+      : `New enquiry${name ? ` from ${name}` : ""}`;
+
+  return {
+    ...(accessKey ? { access_key: accessKey } : {}),
+    subject,
+    from_name: name || "NowMagnate website",
+    replyto: email,
+    _subject: subject,
+    _replyto: email,
+    kind,
+    ...data,
+  };
+}
 
 /**
  * Best-effort email ping after a successful Firestore write. This must never
@@ -25,8 +57,8 @@ async function pingRelay(kind: LeadKind, data: Record<string, unknown>) {
   try {
     await fetch(formRelayEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ kind, ...data }),
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(relayPayload(kind, data)),
       keepalive: true,
     });
   } catch {
