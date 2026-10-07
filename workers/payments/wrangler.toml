@@ -23,7 +23,7 @@ FROM_ADDRESS = "payments@nowmagnate.com"
 # then paste the id it prints below.
 [[kv_namespaces]]
 binding = "STORE"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "aa8e79178c414e97aedc6a0a796d55c9"
 
 [[send_email]]
 name = "SEND_EMAIL"
