@@ -5,7 +5,7 @@
  * security rules, not by hiding the config.
  *
  * `firebaseConfigured` lets the rest of the app degrade gracefully before a
- * real project exists, the same pattern used for Stripe in `payments.ts`:
+ * real project exists, the same pattern used for payments in `payments.ts`:
  * the form still renders and can be filled out, it just cannot submit yet,
  * and it says so rather than throwing.
  */

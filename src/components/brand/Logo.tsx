@@ -36,7 +36,7 @@ const wordSize: Record<LogoSize, string> = {
  * this site's spectrum, so the mark still belongs to the page without trying
  * to reproduce the ramp inside a letterform.
  */
-const PARENT_MARK = "/brand/NowMagnate-icon-indigo-512.png";
+export const PARENT_MARK = "/brand/NowMagnate-icon-indigo-512.png";
 
 const tileSize: Record<LogoSize, number> = { sm: 28, md: 36, lg: 48 };
 

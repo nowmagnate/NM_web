@@ -177,6 +177,8 @@ Every section that depends on empty data is **gated by a length check**, so the 
 
 ---
 
+> **Superseded.** Payments now go through Razorpay Standard Checkout with a small Cloudflare Worker (see `workers/payments/README.md` and `src/config/payments.ts`), gated by `NEXT_PUBLIC_PAYMENTS_API_URL`. The Stripe Payment Link design below is kept for history only.
+
 ## Payments — env-gated Stripe
 
 ### `src/config/payments.ts`

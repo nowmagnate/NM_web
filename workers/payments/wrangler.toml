@@ -1,0 +1,35 @@
+name = "nowmagnate-payments"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Served at https://pay.nowmagnate.com. Wrangler creates the DNS record for a
+# custom domain when the zone is on the same Cloudflare account.
+routes = [{ pattern = "pay.nowmagnate.com", custom_domain = true }]
+workers_dev = false
+
+[vars]
+# Origins allowed to call /quote, /orders and /verify from a browser.
+ALLOWED_ORIGINS = "https://nowmagnate.com,https://www.nowmagnate.com,https://nowmagnate-1f5f3.web.app"
+# The mail is delivered to OWNER_INBOX (it must be a verified destination
+# address in Cloudflare Email Routing) and shows ORDERS_ADDRESS in the To
+# header, so a Gmail filter on to:orders@nowmagnate.com matches.
+OWNER_INBOX = "nowmagnate@gmail.com"
+ORDERS_ADDRESS = "orders@nowmagnate.com"
+# Must be an address on a domain that has Email Routing enabled.
+FROM_ADDRESS = "payments@nowmagnate.com"
+
+# Discount codes, usage counts and paid-payment markers.
+# Create it once:  npx wrangler kv namespace create STORE
+# then paste the id it prints below.
+[[kv_namespaces]]
+binding = "STORE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[[send_email]]
+name = "SEND_EMAIL"
+
+# Secrets (never put these in this file). Set each with `wrangler secret put`:
+#   RAZORPAY_KEY_ID            test key id first, live key id at go-live
+#   RAZORPAY_KEY_SECRET
+#   RAZORPAY_WEBHOOK_SECRET    the secret you type when creating the webhook
+#   TURNSTILE_SECRET           optional; turns on the bot check for /orders

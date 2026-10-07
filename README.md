@@ -54,7 +54,8 @@ redeploy, not a config change on a running server.
 
 | Var | Effect when unset |
 |---|---|
-| `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` | Template pages show "Request this template" + a brief-request flow instead of checkout |
+| `NEXT_PUBLIC_PAYMENTS_API_URL` | Template pages show "Request this template" + a brief-request flow instead of checkout |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | No bot check in the checkout form (the payments Worker only requires it when it has a secret) |
 | `NEXT_PUBLIC_FIREBASE_*` | Lead forms render and validate fully, but show a "not fully wired up yet" error on submit with a mailto fallback |
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | App Check stays uninitialized; Firestore rules reject all writes until this and Firebase project config are both set |
 | `NEXT_PUBLIC_FORM_RELAY_ENDPOINT` | No email ping on a new lead; the Firestore document is still the record of truth, checked from the console |
@@ -113,7 +114,7 @@ cp .env.example .env.local
 ```
 
 Fill in the six Firebase values and `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` from
-step 1. Leave `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` empty until the business is
+step 1. Leave `NEXT_PUBLIC_PAYMENTS_API_URL` empty until the business is
 registered with Stripe (see the table above for what that gates).
 
 ```bash
@@ -174,7 +175,7 @@ Add `firestore:rules` to the `--only` list too if `firestore.rules` changed.
 
 1. Register the business with Stripe, create a **Payment Link** for the
    $499 offer in the Stripe dashboard.
-2. Set `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` in `.env.local` (and wherever else
+2. Set `NEXT_PUBLIC_PAYMENTS_API_URL` in `.env.local` (and wherever else
    the build actually runs — see below).
 3. Rebuild and redeploy. See `src/config/payments.ts` for exactly what
    changes on the template pages when this is set.

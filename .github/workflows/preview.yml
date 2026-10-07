@@ -45,7 +45,8 @@ jobs:
           # Preview builds are not the canonical origin, so the site URL is
           # left at its default rather than pointing sitemap/robots at a
           # throwaway channel domain.
-          NEXT_PUBLIC_STRIPE_PAYMENT_LINK: ${{ vars.NEXT_PUBLIC_STRIPE_PAYMENT_LINK }}
+          NEXT_PUBLIC_PAYMENTS_API_URL: ${{ vars.NEXT_PUBLIC_PAYMENTS_API_URL }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
