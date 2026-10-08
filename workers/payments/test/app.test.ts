@@ -221,3 +221,16 @@ test("a paid order with a code counts the redemption and can use up the code", a
   const again = await t.post("/quote", { ...buyer, code: "ONCE" });
   assert.equal((await again.json()).error, "used-up");
 });
+
+test("payments for other products on the same Razorpay account are ignored", async () => {
+  const t = setup();
+  // An order made by something else (no `product` note, or a product we do not sell).
+  t.orders.set("order_other", { id: "order_other", amount: 1000, currency: "INR", notes: [] });
+  t.orders.set("order_unknown", { id: "order_unknown", amount: 1000, currency: "INR", notes: { product: "something-else" } });
+  for (const orderId of ["order_other", "order_unknown"]) {
+    t.payments.set("pay_1", { id: "pay_1", order_id: orderId, amount: 1000, currency: "INR", status: "captured" });
+    assert.equal((await webhook(t, "payment.captured")).status, 200);
+  }
+  assert.equal(t.mails.length, 0);
+  assert.equal(t.kv.has("paid:pay_1"), false);
+});
