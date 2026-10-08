@@ -167,7 +167,7 @@ rule (Security, WAF) for `pay.nowmagnate.com/orders`.
 ## Tests
 
 ```bash
-npm test          # 28 tests, plain Node, no Cloudflare runtime needed
+npm test          # 29 tests, plain Node, no Cloudflare runtime needed
 npm run typecheck
 ```
 

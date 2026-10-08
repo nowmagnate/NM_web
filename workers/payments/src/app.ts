@@ -191,6 +191,11 @@ async function notifyPaid(env: Env, deps: Deps, paymentId: string): Promise<bool
   const order = await getOrder(creds(env), deps.fetch, payment.order_id);
   const notes = notesOf(order);
 
+  // Razorpay sends a webhook for EVERY payment on the account, including other
+  // products that share it. Only orders this Worker created carry a `product`
+  // note that matches the price list; anything else is not ours to email about.
+  if (!notes.product || !Object.hasOwn(PRODUCTS, notes.product)) return false;
+
   const now = deps.now();
   const { subject, text } = orderEmail(
     {
