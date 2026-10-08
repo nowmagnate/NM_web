@@ -56,6 +56,24 @@ export function CheckoutDialog({
   const dialog = useRef<HTMLDialogElement>(null);
   const template = getTemplate(templateSlug);
 
+  /**
+   * A modal <dialog> lives in the browser's top layer, which nothing can be
+   * drawn above, including Razorpay's payment window. So while Razorpay is
+   * open this dialog is hidden (state and typed values are kept, the component
+   * stays mounted) and brought back if the payment window is closed. `hidden`
+   * stops that deliberate close from also telling the parent the dialog was
+   * dismissed.
+   */
+  const hidden = useRef(false);
+  const hideDialog = () => {
+    hidden.current = true;
+    dialog.current?.close();
+  };
+  const showDialog = () => {
+    hidden.current = false;
+    if (dialog.current && !dialog.current.open) dialog.current.showModal();
+  };
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -144,6 +162,7 @@ export function CheckoutDialog({
     }
 
     setStatus("paying");
+    hideDialog();
     openCheckout(
       {
         key: order.keyId,
@@ -159,7 +178,12 @@ export function CheckoutDialog({
         theme: { color: themeColor() },
       },
       {
-        onDismiss: () => setStatus("idle"),
+        onDismiss: () => {
+          setStatus("idle");
+          showDialog();
+        },
+        // Razorpay keeps its own window open after a failed attempt so the
+        // buyer can retry there; the message is shown when they close it.
         onFailed: (message) => {
           setStatus("idle");
           setFormError(message);
@@ -173,6 +197,7 @@ export function CheckoutDialog({
           });
           if (isError(v)) {
             setStatus("idle");
+            showDialog();
             setFormError(
               `Your payment went through (reference ${r.razorpay_payment_id}) but we could not confirm it on this page. ` +
                 `Please email ${brand.email.enquiry} with that reference and we will sort it out.`,
@@ -188,7 +213,9 @@ export function CheckoutDialog({
   return (
     <dialog
       ref={dialog}
-      onClose={onClose}
+      onClose={() => {
+        if (!hidden.current) onClose();
+      }}
       onCancel={(e) => busy && e.preventDefault()}
       className="bg-bg text-ink border-rule-strong m-auto w-[min(32rem,calc(100vw-2rem))] border p-0 backdrop:bg-black/50"
     >
