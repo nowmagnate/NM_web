@@ -67,8 +67,9 @@ export default function PrivacyPolicyPage() {
           Form submissions are stored with Google Firebase (Firestore), Google&apos;s
           cloud database service. Depending on how this deployment is configured, a
           submission may also be relayed to a third-party email service so we get notified
-          of it, and payments for the template offer are processed by Stripe, which has
-          its own privacy policy governing that data.
+          of it, and payments for the template offer are processed by Razorpay, which has its
+          own privacy policy governing that data. Our payment service runs on
+          Cloudflare, which handles the order request but does not keep your card details.
         </p>
         <p className="mt-4">
           None of these providers use your data for their own purposes beyond providing
