@@ -16,8 +16,13 @@ export type Product = {
   title: string;
   description: string;
   currency: "USD";
-  /** List price, in cents. */
+  /** Standard price, in cents. */
   amount: number;
+  /**
+   * A dated offer price, applied automatically until `endsAt` and then gone.
+   * Discount codes are worked out against whatever price is current.
+   */
+  festive?: { amount: number; endsAt: string };
   /** The least a discount may bring the price down to, in cents. */
   minAmount: number;
   /** The buyer must say which template they want. */
@@ -29,8 +34,13 @@ export const PRODUCTS: Record<string, Product> = {
     title: "NowMagnate Innovations website template",
     description: "One customized template site, delivered as agreed",
     currency: "USD",
-    amount: 49900,
-    minAmount: 100,
+    amount: 99900,
+    // Festive offer: $499 until the end of 31 December 2026 in every country we
+    // sell to (23:59:59 at UTC-10). Back to the standard price automatically.
+    festive: { amount: 49900, endsAt: "2027-01-01T09:59:59Z" },
+    // 40% off the festive price. The outreach agent may never go lower, and this
+    // is the backstop if a code is ever mis-created. Raise or lower on purpose.
+    minAmount: 29900,
     requiresTemplate: true,
   },
 };

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { Field, Input } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { Turnstile } from "@/components/forms/Turnstile";
-import { brand } from "@/config/brand";
+import { brand, currentTemplatePrice, festiveOfferActive } from "@/config/brand";
 import { PARENT_MARK } from "@/components/brand/Logo";
 import { siteUrl } from "@/config/site";
 import { turnstileSiteKey } from "@/config/payments";
@@ -231,7 +231,7 @@ export function CheckoutDialog({
           {price ? (
             <>
               {formatMoney(price.amount, price.currency)}
-              {price.discount ? (
+              {price.amount < price.listAmount ? (
                 <span className="text-ink-muted ml-3 text-lg font-normal line-through">
                   {formatMoney(price.listAmount, price.currency)}
                 </span>
@@ -239,7 +239,12 @@ export function CheckoutDialog({
             </>
           ) : (
             <>
-              {formatMoney(brand.templatePrice * 100, brand.templateCurrency)}
+              {formatMoney(currentTemplatePrice() * 100, brand.templateCurrency)}
+              {festiveOfferActive() ? (
+                <span className="text-ink-muted ml-3 text-lg font-normal line-through">
+                  {formatMoney(brand.templatePrice * 100, brand.templateCurrency)}
+                </span>
+              ) : null}
             </>
           )}
         </p>

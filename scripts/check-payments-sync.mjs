@@ -31,6 +31,29 @@ if (!sitePrice || !workerAmount) {
     `price mismatch: site shows ${sitePrice} but the Worker charges ${workerAmount / 100} (${workerAmount} minor units)`,
   );
 }
+// The festive offer: price and end date must agree between the site and the Worker.
+// The site states the last day (YYYY-MM-DD, end of that day everywhere we sell); the
+// Worker stores the exact instant, which is 23:59:59 at UTC-10 on that day.
+const siteFestivePrice = Number(brand.match(/templateFestive:\s*\{\s*price:\s*(\d+)/)?.[1]);
+const siteFestiveEnds = brand.match(/templateFestive:\s*\{[^}]*endsOnIso:\s*"(\d{4}-\d{2}-\d{2})"/)?.[1];
+const workerFestive = products.match(/festive:\s*\{\s*amount:\s*(\d+),\s*endsAt:\s*"([^"]+)"/);
+const workerFestiveAmount = Number(workerFestive?.[1]);
+const workerFestiveEnds = workerFestive?.[2];
+if (!siteFestivePrice || !siteFestiveEnds || !workerFestive) {
+  problems.push("could not read the festive offer from brand.ts or workers/payments/src/products.ts");
+} else {
+  if (siteFestivePrice * 100 !== workerFestiveAmount)
+    problems.push(
+      `festive price mismatch: site ${siteFestivePrice} but the Worker charges ${workerFestiveAmount / 100}`,
+    );
+  const expected = new Date(new Date(`${siteFestiveEnds}T23:59:59Z`).getTime() + 10 * 3_600_000).toISOString();
+  if (new Date(workerFestiveEnds).toISOString() !== expected)
+    problems.push(
+      `festive end mismatch: site says ${siteFestiveEnds} (expected ${expected} in the Worker) but the Worker has ${workerFestiveEnds}`,
+    );
+  if (siteFestivePrice >= sitePrice)
+    problems.push("the festive price must be lower than the standard price, or it is not an offer");
+}
 if (siteCurrency !== workerCurrency) {
   problems.push(`currency mismatch: site ${siteCurrency}, Worker ${workerCurrency}`);
 }
@@ -50,4 +73,6 @@ if (problems.length) {
   console.error("");
   process.exit(1);
 }
-console.log(`\n  Payments sync passed. ${siteSlugs.length} templates, ${sitePrice} ${siteCurrency}.\n`);
+console.log(
+  `\n  Payments sync passed. ${siteSlugs.length} templates, ${sitePrice} ${siteCurrency} standard, ${siteFestivePrice} until ${siteFestiveEnds}.\n`,
+);

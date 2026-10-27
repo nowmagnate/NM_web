@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
 import { Faq } from "@/components/sections/Faq";
 import { PaymentCTA } from "@/components/templates/PaymentCTA";
+import { FestiveBanner } from "@/components/templates/FestiveBanner";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { LivePreview } from "@/components/templates/LivePreview";
 import { hasLivePreview } from "@/templates/registry";
@@ -89,6 +90,7 @@ export default async function TemplateDetailPage({
       <Header />
       <main id="main">
         <Section spacing="compact" className="pt-32">
+          <FestiveBanner className="mb-10" />
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <p className="text-ink-muted text-[12px]">

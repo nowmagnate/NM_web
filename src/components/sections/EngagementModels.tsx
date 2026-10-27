@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { engagementModels } from "@/data/story";
-import { formattedTemplatePrice } from "@/config/brand";
+import { FestivePrice } from "@/components/templates/FestivePrice";
 import { cn } from "@/lib/cn";
 
 /**
@@ -57,7 +57,7 @@ export function EngagementModels() {
 
                 <div className="border-rule mt-10 border-t pt-5">
                   <span className="tabular font-display text-[17px] font-medium">
-                    {highlight ? formattedTemplatePrice() : model.priceNote}
+                    {highlight ? <FestivePrice /> : model.priceNote}
                   </span>
                 </div>
               </Link>

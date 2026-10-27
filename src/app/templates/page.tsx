@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
 import { TemplateCatalog } from "@/components/templates/TemplateCatalog";
+import { FestiveBanner } from "@/components/templates/FestiveBanner";
 import { templates } from "@/data/templates";
 import { formattedTemplatePrice } from "@/config/brand";
 import { pageMetadata } from "@/lib/metadata";
@@ -25,6 +26,7 @@ export default function TemplatesPage() {
       <Header />
       <main id="main">
         <Section spacing="compact" className="pt-32">
+          <FestiveBanner className="mb-10" />
           <div className="max-w-[52ch]">
             <h1 className="font-display text-4xl leading-[1.05] md:text-5xl">
               {templates.length} templates, {formattedTemplatePrice()} each.

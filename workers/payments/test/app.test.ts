@@ -112,7 +112,7 @@ test("orders: a discount code changes the price and is recorded in the notes", a
   assert.equal(data.amount, 39920);
   const notes = t.orders.get(data.orderId)!.notes as Record<string, string>;
   assert.equal(notes.code, "FLASH20");
-  assert.equal(notes.list_amount, "49900");
+  assert.equal(notes.list_amount, "99900");
 });
 
 test("orders: invalid input and a bad template are rejected before Razorpay is called", async () => {

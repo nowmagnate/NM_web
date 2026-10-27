@@ -1,7 +1,7 @@
-import { brand, formattedTemplatePrice } from "@/config/brand";
+import { brand, formattedStandardPrice, formattedTemplatePrice } from "@/config/brand";
 
 /**
- * The $499 offer definition.
+ * The template offer definition (standard price and the dated festive offer).
  *
  * THIS IS A COMMERCIAL COMMITMENT. Everything below renders verbatim on
  * /templates, every template detail page, /pricing and /brief. The turnaround
@@ -17,11 +17,52 @@ import { brand, formattedTemplatePrice } from "@/config/brand";
 /** Declared separately so `steps` below can reference it without self-reference. */
 const TURNAROUND = "5 to 7 business days";
 
+/**
+ * Launch promotion. Valid for orders placed on or before this date, to the end
+ * of that calendar day in every country we sell to.
+ * The wording on the site is date-stamped, so a stale page after this date is
+ * merely out of date, never untrue. Remove `promo` and its two entries in
+ * `included` when it ends, and have the payments Worker codes expire with it.
+ */
+const PROMO_ENDS = "31 December 2026";
+
 export const offer = {
+  /** The price being charged when the site is built (the festive price until it ends). */
   price: formattedTemplatePrice(),
+  standardPrice: formattedStandardPrice(),
   priceValue: brand.templatePrice,
   currency: brand.templateCurrency,
   billing: "One-time. No subscription, no recurring fee.",
+
+  promo: {
+    endsOn: PROMO_ENDS,
+    headline: `Domain and hosting free for 3 years, plus 1 year of maintenance cover, on orders placed by ${PROMO_ENDS}`,
+    domainAndHosting:
+      "We register your domain in your name and host the site for 3 years at no extra cost.",
+    amc: "One year of maintenance cover: if anything on the site breaks or stops working, we fix it at no charge. New pages, new features and content changes are quoted separately.",
+  },
+
+  /**
+   * Black Friday and Christmas 2026 messaging, shown by FestiveBanner.
+   *
+   * The prices are real and enforced: the standard price is `brand.templatePrice`
+   * and the festive price is `brand.templateFestive`, which the payments Worker
+   * applies automatically until the end of 31 December and then drops. Nothing
+   * here may be extended past that date while the page still says the standard
+   * price applies afterwards. Each stage is the last day to send logo, photos and
+   * text for a site to be live before that occasion (the turnaround runs from
+   * receiving them). Stages are in date order and the banner shows the first one
+   * that has not passed. Keep these in step with the outreach project's STATUS.md.
+   */
+  festive: {
+    name: "Black Friday and Christmas offer",
+    endsOnIso: brand.templateFestive.endsOnIso,
+    stages: [
+      { lastDayIso: "2026-11-16", assetsBy: "16 November", liveBefore: "Black Friday" },
+      { lastDayIso: "2026-12-10", assetsBy: "10 December", liveBefore: "Christmas" },
+      { lastDayIso: "2026-12-18", assetsBy: "18 December", liveBefore: "the new year" },
+    ],
+  },
 
   turnaround: TURNAROUND,
   turnaroundNote:
@@ -38,10 +79,12 @@ export const offer = {
     "Google Analytics connected",
     "One round of revisions",
     "Deployment guidance, or we deploy it for you",
+    `Domain and hosting for 3 years (orders placed by ${PROMO_ENDS})`,
+    `1 year of maintenance cover if anything breaks (orders placed by ${PROMO_ENDS})`,
   ],
 
   /**
-   * The exclusions matter more than the inclusions. An unhappy $499 customer
+   * The exclusions matter more than the inclusions. An unhappy customer
    * is almost always someone who assumed one of these was part of the deal.
    */
   notIncluded: [
@@ -51,7 +94,8 @@ export const offer = {
     "Copywriting",
     "Photography or stock image licensing",
     "Multi-language versions",
-    "Ongoing hosting, maintenance or content updates",
+    "New features, new pages or content updates after launch (maintenance cover is for fixes only)",
+    "Domain and hosting after the included 3 years",
     "Additional revision rounds beyond the first",
   ],
 
