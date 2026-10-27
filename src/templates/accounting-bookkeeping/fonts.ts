@@ -1,4 +1,4 @@
-import { Epilogue, IBM_Plex_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * BALANCE — Epilogue over IBM Plex Sans.
@@ -14,17 +14,24 @@ import { Epilogue, IBM_Plex_Sans } from "next/font/google";
  * template in the catalog.
  */
 
-const display = Epilogue({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const accountingBookkeepingDisplay = localFont({
+  src: "../kit/fonts/Epilogue-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "100 900",
+  adjustFontFallback: "Arial",
 });
 
-const body = IBM_Plex_Sans({
-  subsets: ["latin"],
+const accountingBookkeepingBody = localFont({
+  src: "../kit/fonts/IBMPlexSans-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
-  weight: ["300", "400", "500", "600"],
+  weight: "100 700",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${accountingBookkeepingDisplay.variable} ${accountingBookkeepingBody.variable}`;

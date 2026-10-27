@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Jost } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * ATELIER — Cormorant Garamond over Jost.
@@ -16,17 +16,24 @@ import { Cormorant_Garamond, Jost } from "next/font/google";
  * the two are never compared; see the two rules in `kit/typography.ts`.
  */
 
-const display = Cormorant_Garamond({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const interiorDesignerDisplay = localFont({
+  src: "../kit/fonts/CormorantGaramond-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
-  weight: ["300", "400", "500", "600"],
+  weight: "300 700",
+  adjustFontFallback: "Times New Roman",
 });
 
-const body = Jost({
-  subsets: ["latin"],
+const interiorDesignerBody = localFont({
+  src: "../kit/fonts/Jost-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "100 900",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${interiorDesignerDisplay.variable} ${interiorDesignerBody.variable}`;

@@ -1,4 +1,4 @@
-import { Instrument_Serif, Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * MERIDIAN — Instrument Serif over Public Sans.
@@ -13,17 +13,24 @@ import { Instrument_Serif, Public_Sans } from "next/font/google";
  * on a page that is mostly numbers in a grid.
  */
 
-const display = Instrument_Serif({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const realEstateAgentDisplay = localFont({
+  src: "../kit/fonts/InstrumentSerif-400.woff2",
   variable: "--tpl-font-display",
   display: "swap",
   weight: "400",
+  adjustFontFallback: "Times New Roman",
 });
 
-const body = Public_Sans({
-  subsets: ["latin"],
+const realEstateAgentBody = localFont({
+  src: "../kit/fonts/PublicSans-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "100 900",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${realEstateAgentDisplay.variable} ${realEstateAgentBody.variable}`;

@@ -1,4 +1,4 @@
-import { DM_Serif_Display, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * PASSAGE — DM Serif Display over Instrument Sans.
@@ -14,17 +14,24 @@ import { DM_Serif_Display, Instrument_Sans } from "next/font/google";
  * rather than Karla because Counsel carries Karla in the same category.
  */
 
-const display = DM_Serif_Display({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const immigrationAttorneyDisplay = localFont({
+  src: "../kit/fonts/DMSerifDisplay-400.woff2",
   variable: "--tpl-font-display",
   display: "swap",
   weight: "400",
+  adjustFontFallback: "Times New Roman",
 });
 
-const body = Instrument_Sans({
-  subsets: ["latin"],
+const immigrationAttorneyBody = localFont({
+  src: "../kit/fonts/InstrumentSans-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "400 700",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${immigrationAttorneyDisplay.variable} ${immigrationAttorneyBody.variable}`;

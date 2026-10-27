@@ -1,4 +1,4 @@
-import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * FRAMEWORK — Space Grotesk over IBM Plex Sans.
@@ -12,16 +12,24 @@ import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
  * a very different palette.
  */
 
-const display = Space_Grotesk({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const remodelingContractorDisplay = localFont({
+  src: "../kit/fonts/SpaceGrotesk-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "300 700",
+  adjustFontFallback: "Arial",
 });
 
-const body = IBM_Plex_Sans({
-  subsets: ["latin"],
+const remodelingContractorBody = localFont({
+  src: "../kit/fonts/IBMPlexSans-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "100 700",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${remodelingContractorDisplay.variable} ${remodelingContractorBody.variable}`;
