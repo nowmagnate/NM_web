@@ -53,26 +53,30 @@ export function PaymentCTA({ templateSlug }: { templateSlug: string }) {
   if (paymentsEnabled) {
     const label = quote ? formatMoney(quote.amount, quote.currency) : formattedTemplatePrice();
     return (
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Button type="button" size="lg" onClick={() => setOpen(true)}>
-          Get started · {label}
-          {quote?.discount ? <span className="sr-only"> (discount applied)</span> : null}
-        </Button>
+      <div className="flex flex-col gap-3">
+        {/* The buttons wrap rather than overflow: the column is only ~370px wide
+            at a 1024px viewport and the two buttons together are wider. */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <Button type="button" size="lg" onClick={() => setOpen(true)}>
+            Get started · {label}
+            {quote?.discount ? <span className="sr-only"> (discount applied)</span> : null}
+          </Button>
+          <Button href={`/brief?template=${templateSlug}`} size="lg" variant="text">
+            Ask a question first
+          </Button>
+          <CheckoutDialog
+            templateSlug={templateSlug}
+            open={open}
+            onClose={() => setOpen(false)}
+            initialCode={code}
+            initialQuote={quote}
+          />
+        </div>
         {quote && quote.amount < quote.listAmount ? (
           <p className="text-ink-muted text-sm">
             <s>{formatMoney(quote.listAmount, quote.currency)}</s> standard price
           </p>
         ) : null}
-        <Button href={`/brief?template=${templateSlug}`} size="lg" variant="text">
-          Ask a question first
-        </Button>
-        <CheckoutDialog
-          templateSlug={templateSlug}
-          open={open}
-          onClose={() => setOpen(false)}
-          initialCode={code}
-          initialQuote={quote}
-        />
       </div>
     );
   }
