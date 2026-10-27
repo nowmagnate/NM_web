@@ -78,7 +78,7 @@ export const templateFaq: FaqItem[] = [
   {
     question: "Do I need to buy hosting and a domain?",
     answer:
-      "You need a domain. Hosting for a site this size is usually free or a few dollars a month, and we will point you at a sensible option. Ongoing hosting and maintenance are not part of the one-time fee.",
+      `For orders placed by ${offer.promo.endsOn}, domain and hosting are included for 3 years and the domain is registered in your name. After that, renewal is a small yearly cost, or you can take the site to any host. For later orders you need your own domain, and we will point you at a sensible hosting option.`,
   },
   {
     question: "Can you add online booking or payments?",
@@ -92,7 +92,7 @@ export const templateFaq: FaqItem[] = [
   {
     question: "What if I want changes a year from now?",
     answer:
-      "You own the site and can hand it to anyone. If you would rather we did it, we will quote the work. There is no lock-in and no mandatory retainer.",
+      `You own the site and can hand it to anyone. Orders placed by ${offer.promo.endsOn} include a year of maintenance cover for anything that breaks. Changes and additions are quoted separately. There is no lock-in and no mandatory retainer.`,
   },
 ];
 

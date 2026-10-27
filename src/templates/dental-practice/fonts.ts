@@ -1,4 +1,4 @@
-import { Bricolage_Grotesque, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * ENAMEL — Bricolage Grotesque over Manrope.
@@ -20,17 +20,25 @@ import { Bricolage_Grotesque, Manrope } from "next/font/google";
  * Only one template ever renders on a page, so there is no collision.
  */
 
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const dentalPracticeDisplay = localFont({
+  src: "../kit/fonts/BricolageGrotesque-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "200 800",
+  adjustFontFallback: "Arial",
 });
 
-const body = Manrope({
-  subsets: ["latin"],
+const dentalPracticeBody = localFont({
+  src: "../kit/fonts/Manrope-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "200 800",
+  adjustFontFallback: "Arial",
 });
 
 /** Applied to the template wrapper by TemplateRenderer. */
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${dentalPracticeDisplay.variable} ${dentalPracticeBody.variable}`;

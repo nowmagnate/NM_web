@@ -1,4 +1,4 @@
-import { Newsreader, Karla } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * VERGE — Newsreader over Karla.
@@ -12,16 +12,24 @@ import { Newsreader, Karla } from "next/font/google";
  * list from reading as a specification document.
  */
 
-const display = Newsreader({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const landscapeDesignBuildDisplay = localFont({
+  src: "../kit/fonts/Newsreader-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "200 800",
+  adjustFontFallback: "Times New Roman",
 });
 
-const body = Karla({
-  subsets: ["latin"],
+const landscapeDesignBuildBody = localFont({
+  src: "../kit/fonts/Karla-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "200 800",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${landscapeDesignBuildDisplay.variable} ${landscapeDesignBuildBody.variable}`;

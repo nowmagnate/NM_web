@@ -30,16 +30,21 @@ export function PaymentCTA({ templateSlug }: { templateSlug: string }) {
   const [code, setCode] = useState<string | undefined>();
   const [quote, setQuote] = useState<Quote | null>(null);
 
+  // Always ask the Worker what the price is right now, so the button never shows
+  // a price the Worker would not charge (for example after the festive offer
+  // ends). A `?code=` is priced too; a code that is refused falls back to the
+  // plain price.
   useEffect(() => {
     if (!paymentsEnabled) return;
-    const fromUrl = new URLSearchParams(window.location.search).get("code")?.trim();
-    if (!fromUrl) return;
+    const fromUrl = new URLSearchParams(window.location.search).get("code")?.trim() || undefined;
     let cancelled = false;
-    getQuote({ product: "template", template: templateSlug, code: fromUrl }).then((r) => {
+    (async () => {
+      let r = await getQuote({ product: "template", template: templateSlug, code: fromUrl });
+      if (isError(r) && fromUrl) r = await getQuote({ product: "template", template: templateSlug });
       if (cancelled || isError(r)) return;
-      setCode(fromUrl);
+      if (fromUrl && r.discount) setCode(fromUrl);
       setQuote(r);
-    });
+    })();
     return () => {
       cancelled = true;
     };
@@ -53,6 +58,11 @@ export function PaymentCTA({ templateSlug }: { templateSlug: string }) {
           Get started · {label}
           {quote?.discount ? <span className="sr-only"> (discount applied)</span> : null}
         </Button>
+        {quote && quote.amount < quote.listAmount ? (
+          <p className="text-ink-muted text-sm">
+            <s>{formatMoney(quote.listAmount, quote.currency)}</s> standard price
+          </p>
+        ) : null}
         <Button href={`/brief?template=${templateSlug}`} size="lg" variant="text">
           Ask a question first
         </Button>

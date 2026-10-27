@@ -25,3 +25,6 @@ yarn-error.log*
 fb-secret-key/
 *serviceaccount*.json
 *adminsdk*.json
+
+# Claude Cowork outreach project: private, never commit.
+/cowork-outreach/

@@ -9,6 +9,7 @@ import { Faq } from "@/components/sections/Faq";
 import { engagementModels } from "@/data/story";
 import { templates } from "@/data/templates";
 import { offer } from "@/data/offer";
+import { FestivePrice } from "@/components/templates/FestivePrice";
 import { pricingFaq } from "@/data/faq";
 import { pageMetadata } from "@/lib/metadata";
 import { faqJsonLd } from "@/lib/jsonLd";
@@ -63,7 +64,7 @@ export default function PricingPage() {
 
                     <div className="border-rule mt-8 flex items-center justify-between border-t pt-5">
                       <span className="font-display text-lg">
-                        {highlight ? offer.price : model.priceNote}
+                        {highlight ? <FestivePrice /> : model.priceNote}
                       </span>
                       <Button href={model.href} size="sm">
                         {highlight ? "Browse templates" : "Get in touch"}

@@ -57,7 +57,13 @@ export const brand = {
   },
 
   // The productized landing-page offer.
-  templatePrice: 499,
+  // `templatePrice` is the STANDARD price: what the payments Worker charges
+  // whenever no festive offer is running, and what applies from 1 January 2027.
+  // The festive offer is a real, dated price, applied automatically by the
+  // Worker until the end of `endsOnIso` (end of that calendar day in every
+  // country we sell to). `npm run check:payments` keeps the two in step.
+  templatePrice: 999,
+  templateFestive: { price: 499, endsOnIso: "2026-12-31" },
   templateCurrency: "USD",
 } as const;
 
@@ -85,13 +91,39 @@ export function makersMark(): string {
   return brand.shortName.slice(0, 2).toUpperCase();
 }
 
-/** "$499" — formatted once so the price renders identically everywhere. */
-export function formattedTemplatePrice(): string {
+function usd(amount: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: brand.templateCurrency,
     maximumFractionDigits: 0,
-  }).format(brand.templatePrice);
+  }).format(amount);
+}
+
+/** A date as YYYY-MM-DD in the reader's own calendar. */
+function isoDay(now: Date): string {
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${m}-${d}`;
+}
+
+/** True while the festive offer is running (through the end of `endsOnIso`). */
+export function festiveOfferActive(now: Date = new Date()): boolean {
+  return isoDay(now) <= brand.templateFestive.endsOnIso;
+}
+
+/** The price being charged at `now`: the festive offer, then the standard price. */
+export function currentTemplatePrice(now: Date = new Date()): number {
+  return festiveOfferActive(now) ? brand.templateFestive.price : brand.templatePrice;
+}
+
+/** "$499" or "$999", whichever is being charged. Formatted once so it renders identically everywhere. */
+export function formattedTemplatePrice(now: Date = new Date()): string {
+  return usd(currentTemplatePrice(now));
+}
+
+/** "$999", the standard price. */
+export function formattedStandardPrice(): string {
+  return usd(brand.templatePrice);
 }
 
 /** Social links that actually have a URL, ready to map over in the footer. */

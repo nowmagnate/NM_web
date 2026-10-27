@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { PRODUCTS, TEMPLATE_SLUGS } from "../src/products.ts";
-import { parseDiscount, priceFor } from "../src/pricing.ts";
+import { currentAmount, parseDiscount, priceFor } from "../src/pricing.ts";
 import { validateOrder, validateSelection } from "../src/validate.ts";
 import { hmacHex, safeEqual, verifyPaymentSignature, verifyWebhookSignature } from "../src/crypto.ts";
 import { buildMessage, orderEmail } from "../src/mime.ts";
@@ -20,9 +20,30 @@ const price = (code: string | undefined, raw: string | null, used = 0) =>
 
 /* ------------------------------------------------------------------ pricing */
 
-test("no code: list price, no discount", () => {
+test("no code, festive offer running: the festive price, with the standard price as list", () => {
   const r = price(undefined, null);
-  assert.deepEqual(r, { ok: true, amount: 49900, listAmount: 49900, currency: "USD" });
+  assert.deepEqual(r, { ok: true, amount: 49900, listAmount: 99900, currency: "USD" });
+});
+
+test("the festive price ends exactly at its end time and the standard price returns", () => {
+  const ends = new Date(product.festive!.endsAt);
+  assert.equal(currentAmount(product, new Date(ends.getTime() - 1000)), 49900);
+  assert.equal(currentAmount(product, ends), 99900);
+  const after = priceFor({ productId: "template", product, now: new Date("2027-01-05T00:00:00Z") });
+  assert.deepEqual(after, { ok: true, amount: 99900, listAmount: 99900, currency: "USD" });
+});
+
+test("discount codes take their percentage off the price in force, festive or standard", () => {
+  const festive = price("A", '{"percentOff":40}') as { amount: number };
+  assert.equal(festive.amount, 29940);
+  const later = priceFor({
+    productId: "template",
+    product,
+    code: "A",
+    record: parseDiscount('{"percentOff":40}'),
+    now: new Date("2027-01-05T00:00:00Z"),
+  }) as { amount: number };
+  assert.equal(later.amount, 59940);
 });
 
 test("percent, amount and final-price discounts", () => {
@@ -38,9 +59,9 @@ test("discount result names the code, label and saving", () => {
   assert.equal(r.ok && r.discount?.off, 9980);
 });
 
-test("price never goes below the floor or above the list price", () => {
+test("price never goes below the floor or above the price in force", () => {
   assert.equal((price("A", '{"amountOff":999999}') as { amount: number }).amount, product.minAmount);
-  assert.equal((price("A", '{"finalAmount":999999}') as { amount: number }).amount, product.amount);
+  assert.equal((price("A", '{"finalAmount":999999}') as { amount: number }).amount, 49900);
 });
 
 test("unknown, not started, expired, used up, wrong product", () => {

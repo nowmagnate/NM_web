@@ -1,4 +1,4 @@
-import { Familjen_Grotesk, Figtree } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * SPROUT — Familjen Grotesk over Figtree.
@@ -17,16 +17,24 @@ import { Familjen_Grotesk, Figtree } from "next/font/google";
  * that matters: see `kit/typography.ts`.
  */
 
-const display = Familjen_Grotesk({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const pediatricClinicDisplay = localFont({
+  src: "../kit/fonts/FamiljenGrotesk-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "400 700",
+  adjustFontFallback: "Arial",
 });
 
-const body = Figtree({
-  subsets: ["latin"],
+const pediatricClinicBody = localFont({
+  src: "../kit/fonts/Figtree-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "300 900",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${pediatricClinicDisplay.variable} ${pediatricClinicBody.variable}`;

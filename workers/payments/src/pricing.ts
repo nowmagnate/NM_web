@@ -85,6 +85,12 @@ export type PriceResult =
     }
   | { ok: false; error: DiscountError };
 
+/** The price in force at `now`: the festive offer while it runs, otherwise the standard price. */
+export function currentAmount(product: Product, now: Date): number {
+  const f = product.festive;
+  return f && now < new Date(f.endsAt) ? f.amount : product.amount;
+}
+
 export function normalizeCode(code: string | undefined): string {
   return (code ?? "").trim().toUpperCase();
 }
@@ -103,9 +109,10 @@ export function priceFor(args: {
 }): PriceResult {
   const { productId, product, now } = args;
   const code = normalizeCode(args.code);
+  const current = currentAmount(product, now);
   const base = { listAmount: product.amount, currency: product.currency };
 
-  if (!code) return { ok: true, amount: product.amount, ...base };
+  if (!code) return { ok: true, amount: current, ...base };
 
   const rec = args.record;
   if (!rec) return { ok: false, error: "unknown-code" };
@@ -117,18 +124,19 @@ export function priceFor(args: {
   if (rec.products && rec.products.length > 0 && !rec.products.includes(productId))
     return { ok: false, error: "not-applicable" };
 
-  let amount = product.amount;
-  if (rec.percentOff !== undefined) amount = Math.round((product.amount * (100 - rec.percentOff)) / 100);
-  else if (rec.amountOff !== undefined) amount = product.amount - Math.round(rec.amountOff);
+  // Codes work off the price in force now (the festive offer while it runs).
+  let amount = current;
+  if (rec.percentOff !== undefined) amount = Math.round((current * (100 - rec.percentOff)) / 100);
+  else if (rec.amountOff !== undefined) amount = current - Math.round(rec.amountOff);
   else if (rec.finalAmount !== undefined) amount = Math.round(rec.finalAmount);
 
-  // Never below the product's floor, and never above the list price.
-  amount = Math.max(product.minAmount, Math.min(product.amount, amount));
+  // Never below the product's floor, and never above the price in force.
+  amount = Math.max(product.minAmount, Math.min(current, amount));
 
   return {
     ok: true,
     amount,
     ...base,
-    discount: { code, label: rec.label ?? "Discount", off: product.amount - amount },
+    discount: { code, label: rec.label ?? "Discount", off: current - amount },
   };
 }

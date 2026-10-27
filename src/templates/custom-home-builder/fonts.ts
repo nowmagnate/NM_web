@@ -1,4 +1,4 @@
-import { Lora, Figtree } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
  * CORNERSTONE — Lora over Figtree.
@@ -11,16 +11,24 @@ import { Lora, Figtree } from "next/font/google";
  * rows down, which sells against a cheaper bid rather than for a life.
  */
 
-const display = Lora({
-  subsets: ["latin"],
+// Self-hosted: the files live in ../kit/fonts (see its README) so a build never
+// depends on Google being reachable or well-behaved. The constant names are
+// prefixed with the template on purpose: next/font/local uses them as the CSS
+// font-family names, and all 24 templates load on one page, so they must be unique.
+const customHomeBuilderDisplay = localFont({
+  src: "../kit/fonts/Lora-Variable.woff2",
   variable: "--tpl-font-display",
   display: "swap",
+  weight: "400 700",
+  adjustFontFallback: "Times New Roman",
 });
 
-const body = Figtree({
-  subsets: ["latin"],
+const customHomeBuilderBody = localFont({
+  src: "../kit/fonts/Figtree-Variable.woff2",
   variable: "--tpl-font-body",
   display: "swap",
+  weight: "300 900",
+  adjustFontFallback: "Arial",
 });
 
-export const fontClassName = `${display.variable} ${body.variable}`;
+export const fontClassName = `${customHomeBuilderDisplay.variable} ${customHomeBuilderBody.variable}`;

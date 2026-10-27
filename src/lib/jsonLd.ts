@@ -1,4 +1,4 @@
-import { brand } from "@/config/brand";
+import { brand, currentTemplatePrice, festiveOfferActive } from "@/config/brand";
 import { siteUrl } from "@/config/site";
 import type { FaqItem } from "@/data/faq";
 
@@ -47,7 +47,7 @@ export function serviceJsonLd({
   };
 }
 
-/** For the $499 template offer specifically — a Product, not a Service, since it has a fixed price. */
+/** For the template offer specifically: a Product, not a Service, since it has a fixed price. */
 export function templateProductJsonLd({
   name,
   description,
@@ -69,8 +69,9 @@ export function templateProductJsonLd({
     brand: { "@type": "Brand", name: brand.name },
     offers: {
       "@type": "Offer",
-      price: brand.templatePrice,
+      price: currentTemplatePrice(),
       priceCurrency: brand.templateCurrency,
+      ...(festiveOfferActive() ? { priceValidUntil: brand.templateFestive.endsOnIso } : {}),
       availability: "https://schema.org/InStock",
       url: `${siteUrl}${path}`,
     },
